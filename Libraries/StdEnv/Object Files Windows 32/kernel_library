@@ -86,3 +86,7 @@ SetUnhandledExceptionFilter@4
 VirtualProtect@16
 GetVersionExA@4
 WaitForMultipleObjects@16
+GetShortPathNameA@12
+UnmapViewOfFile@8
+OpenProcess@12
+InterlockedIncrement
