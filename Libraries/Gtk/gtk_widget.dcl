@@ -1,5 +1,6 @@
 definition module gtk_widget;
 
+import StdInt;
 import gtk_types,pango_layout,gdk_gc;
 
 :: GdkModifierType:==Int;
@@ -8,8 +9,8 @@ import gtk_types,pango_layout,gdk_gc;
 
 GTK_STATE_NORMAL:==0;
 
-gtk_widget_style_offset:==24;
-gtk_widget_window_offset:==52;
+gtk_widget_style_offset:==IF_INT_64_OR_32 48 24;
+gtk_widget_window_offset:==IF_INT_64_OR_32 80 52;
 
 gtk_widget_show :: !GtkWidgetP !GtkSt -> GtkSt;
 gtk_widget_show_all :: !GtkWidgetP !GtkSt -> GtkSt;
