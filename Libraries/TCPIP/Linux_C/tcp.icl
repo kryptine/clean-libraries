@@ -135,7 +135,7 @@ openTCP_ListenerC portNum e
 openTCP_ListenerC64 :: !Int !*env -> (!(!InetErrCode, !EndpointRef), !*env)
 openTCP_ListenerC64 portNum e
 	= code inline {
-		ccall openTCP_ListenerC "I:VIp:A"
+		ccall openTCP_ListenerC "I:VII:A"
 	}
 
 openTCP_ListenerC32 :: !Int !*env -> (!(!InetErrCode, !EndpointRef), !*env)
@@ -212,7 +212,7 @@ acceptC listener e
 acceptC64 :: !EndpointRef !*env -> (!(!InetErrCode, !Int, !EndpointRef),!*env) 
 acceptC64 listener e
 	= code inline {
-		ccall acceptC "p:VIIp:A"
+		ccall acceptC "p:VIII:A"
 	}
 
 acceptC32 :: !EndpointRef !*env -> (!(!InetErrCode, !Int, !EndpointRef),!*env) 
@@ -336,7 +336,7 @@ selectChC :: !Int !Bool !(!Bool, !Int) !{#EndpointRef} !{#Int} !{#EndpointRef} !
 	after function execution those elements of rcvEndpoints will be set to 0 which are readable or "eom"
 	after function execution those elements of sndEndpoints will be set to 0 which are sendable or "disconnected"
 */
-selectChC justForMac nonBlocking doTimeout stopTime pRChannels justForMac2 pSChannels
+selectChC justForMac nonBlocking doTimeout_and_stopTime pRChannels justForMac2 pSChannels env
 	= code {
 		ccall selectChC "IIIIAAA:VI:A"
 	}

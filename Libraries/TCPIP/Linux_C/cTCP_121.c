@@ -396,15 +396,14 @@ void garbageCollectEndpointC (SOCKET endpointRef)
 	}
 }
 
-void initFD_SET(fd_set**ppSet, long sockets[], int n)
+void initFD_SET (fd_set *pSet, long sockets[], int n)
 {
 	int	i;
-	fd_set *pSet;
 
-	pSet	= (fd_set*) calloc (1,n*sizeof(SOCKET)+sizeof(u_int));
-	for(i=0; i<n; i++)
+	FD_ZERO (pSet);
+
+	for (i=0; i<n; i++)
 		FD_SET(sockets[i], pSet);
-	*ppSet	= pSet;
 }
 
 void selectChC (int justForMac, int nonBlocking, int doTimeout, unsigned int stopTime, 
@@ -413,7 +412,7 @@ void selectChC (int justForMac, int nonBlocking, int doTimeout, unsigned int sto
 	/* error code: 0=ok; 1=timeout expired, 3=other errors */
 {
 	int				nRChannels, nSChannels, i;
-	fd_set *pReadSet, *pWriteSet;
+	fd_set readSet, writeSet;
 	struct timeval timeout;
 	unsigned int	now;
 	int	n,timeoutTicks,max_fd;
@@ -451,9 +450,9 @@ void selectChC (int justForMac, int nonBlocking, int doTimeout, unsigned int sto
 		timeout.tv_sec	= timeoutTicks / 1000;			/* Timeout in sec's */
 		timeout.tv_usec	= (timeoutTicks % 1000)*1000;	/* Timeout in microsec's */
 	}
-	initFD_SET (&pReadSet,  pRChannels, nRChannels);
-	initFD_SET (&pWriteSet, pSChannels, nSChannels);
-	n = select (max_fd+1,pReadSet,pWriteSet,NULL, doTimeout ? &timeout : NULL);
+	initFD_SET (&readSet,  pRChannels, nRChannels);
+	initFD_SET (&writeSet, pSChannels, nSChannels);
+	n = select (max_fd+1,&readSet,&writeSet,NULL, doTimeout ? &timeout : NULL);
 	if (n==0){
 		/* timeout expired */
 		*pErrCode	= 1;
@@ -464,10 +463,10 @@ void selectChC (int justForMac, int nonBlocking, int doTimeout, unsigned int sto
 		return;
 	}
 	for(i=0; i<nRChannels; i++)
-		if (FD_ISSET(pRChannels[i], pReadSet))
+		if (FD_ISSET(pRChannels[i], &readSet))
 			pRChannels[i]	= 0;
 	for(i=0; i<nSChannels; i++)
-		if (FD_ISSET(pSChannels[i], pWriteSet))
+		if (FD_ISSET(pSChannels[i], &writeSet))
 			pSChannels[i]	= 0;
 	*pErrCode	= 0;
 }
