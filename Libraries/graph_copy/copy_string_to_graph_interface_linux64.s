@@ -24,9 +24,11 @@ __copy__string__to__graph:
 	mov	rcx,rsp
 
 	mov	rbp,rsp
+	mov	r14,r9
 	and	rsp,-8
 	call	copy_string_to_graph
 	mov	rsp,rbp
+	mov	r9,r14
 
 	mov	rsi,r12
 	mov	rdi,r13
@@ -44,9 +46,11 @@ __copy__string__to__graph:
 	mov	rsi,rax
 
 	mov	rbp,rsp
+	mov	r14,r9
 	and	rsp,-8
 	call	remove_forwarding_pointers_from_string
 	mov	rsp,rbp
+	mov	r9,r14
 
 	mov	rsi,r12
 	mov	rdi,r13

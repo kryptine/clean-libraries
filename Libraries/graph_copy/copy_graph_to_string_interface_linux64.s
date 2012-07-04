@@ -8,6 +8,11 @@
 
 	.intel_syntax noprefix
 
+.ifdef THREAD
+heap_p_offset	= 192
+heap_size_offset	= 280
+.endif
+
 	.globl	__copy__graph__to__string
 
 __copy__graph__to__string:
@@ -20,10 +25,21 @@ __copy__graph__to__string:
 	mov	rsi,r13
 	lea	rdx,[r13+r15*8]
 
+.ifdef THREAD
+ 	mov	rcx,qword ptr heap_p_offset[r9]
+ 	mov	r8,qword ptr heap_size_offset[r9]
+.endif
+
 	mov	rbp,rsp
+.ifdef THREAD
+	mov	r14,r9
+.endif
 	and	rsp,-8
 	call	copy_graph_to_string
 	mov	rsp,rbp
+.ifdef THREAD
+	mov	r9,r14
+.endif
 	mov	rcx,qword ptr [rsp]
 	push	rax
 
@@ -31,9 +47,15 @@ __copy__graph__to__string:
 	lea	rsi,[r13+r15*8]
 
 	mov	rbp,rsp
+.ifdef THREAD
+	mov	r14,r9
+.endif
 	and	rsp,-8
 	call	remove_forwarding_pointers_from_graph
 	mov	rsp,rbp
+.ifdef THREAD
+	mov	r9,r14
+.endif
 	pop	rcx
 
 	mov	rsi,r12
