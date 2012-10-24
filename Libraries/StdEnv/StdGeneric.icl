@@ -12,7 +12,8 @@ bimap{|c|} = { map_to = id, map_from = id }
 bimap{|PAIR|} bx by = { map_to= map_to, map_from=map_from }
 where
 	map_to (PAIR x y) 	= PAIR (bx.map_to x) (by.map_to y)
-	map_from (PAIR x y) 	= PAIR (bx.map_from x) (by.map_from y)
+	map_from (PAIR x y) = PAIR (bx.map_from x) (by.map_from y)
+
 bimap{|EITHER|} bl br = { map_to= map_to, map_from=map_from }
 where	
 	map_to (LEFT x) 	= LEFT (bl.map_to x)
@@ -29,6 +30,11 @@ bimap{|CONS|} barg = { map_to= map_to, map_from=map_from }
 where
 	map_to   (CONS x) = CONS (barg.map_to x)
 	map_from (CONS x) = CONS (barg.map_from x)
+
+bimap{|RECORD|} barg = { map_to= map_to, map_from=map_from }
+where
+	map_to   (RECORD x) = RECORD (barg.map_to x)
+	map_from (RECORD x) = RECORD (barg.map_from x)
 
 bimap{|FIELD|} barg = { map_to= map_to, map_from=map_from }
 where
