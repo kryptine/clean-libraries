@@ -15,10 +15,9 @@ gToString{|(->)|} fa fr sep f 			= "<fun>"
 gToString{|CONS of d|} fx sep (CONS x) 
 	| d.gcd_arity == 0
 		= d.gcd_name 
-	| isEmpty d.gcd_fields // is not a record
 		= "(" +++ d.gcd_name +++ " " +++ fx " " x +++ ")"
-	| otherwise // is a record
-		= "{" +++ {d.gcd_name.[i]\\i<-[1..size d.gcd_name-1]} +++ " | " +++ fx ", " x +++ "}"
+gToString{|RECORD of d|} fx sep (RECORD x) 
+	= "{" +++ d.grd_name +++ " | " +++ fx ", " x +++ "}"
 gToString{|FIELD of {gfd_name}|} fx sep (FIELD x)	 
 	= gfd_name +++ "=" +++ fx sep x
 gToString{|OBJECT|} fx sep (OBJECT x)	 

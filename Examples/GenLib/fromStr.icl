@@ -59,9 +59,11 @@ gFromString{|OBJECT|} fx str pos
 	# (mx, st) = fx str pos
 	= (mapMaybe OBJECT mx, st)
 	
+gFromString{|RECORD|} fx str pos
+	= abort "gFromString for records is not implemented" 
+
 gFromString{|FIELD of {gfd_name}|} fx str pos
 	= abort "gFromString for fields is not implemented" 
-					
 					
 gFromString{|[]|} f str start_pos
 	# (ok, pos) = lexWantChar '[' str start_pos
