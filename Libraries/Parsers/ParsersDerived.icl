@@ -47,7 +47,7 @@ from StdEnv import const, instance == Char
 <!+:> p = p <:&:> <!+:> p
 
 <?> :: (Parser s r t) (r -> u) u -> Parser s u t
-<?> p f c = p <@ f <|> yield c
+<?> p f c = p <@ f <!> yield c
 
 <!?> :: (Parser s r t) (r -> u) u -> Parser s u t
 <!?> p f c = first (<?> p f c)
