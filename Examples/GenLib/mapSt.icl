@@ -7,6 +7,7 @@ import StdGeneric, StdEnv
 
 generic gMapRSt a b :: .a .st -> (.b, .st)
 gMapRSt{|c|} x st 						= (x, st)
+gMapRSt{|UNIT|} x st					= (x, st)
 gMapRSt{|PAIR|} fx fy (PAIR x y) st 	=	
 	let 
 		(y1, st1) = fy y st
@@ -21,6 +22,7 @@ gMapRSt{|OBJECT|} f (OBJECT x) st 		= let (x1, st1) = f x st in (OBJECT x1, st1)
 
 generic gMapLSt a b :: .a .st -> (.b, .st)
 gMapLSt{|c|} x st 						= (x, st)
+gMapLSt{|UNIT|} x st 					= (x, st)
 gMapLSt{|PAIR|} fx fy 	(PAIR x y) st	= 
 	let 
 		(x1, st1) = fx x st

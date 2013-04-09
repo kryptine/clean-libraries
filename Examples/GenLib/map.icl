@@ -4,6 +4,7 @@ import StdGeneric, StdEnv
 
 generic gMap a b :: .a -> .b
 gMap{|c|} x 					= x
+gMap{|UNIT|} x					= x
 gMap{|PAIR|} fx fy (PAIR x y) 	= PAIR (fx x) (fy y) 
 gMap{|EITHER|} fl fr (LEFT x) 	= LEFT (fl x)
 gMap{|EITHER|} fl fr (RIGHT x) 	= RIGHT (fr x)

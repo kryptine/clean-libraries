@@ -14,6 +14,7 @@ gReduce{|OBJECT|} f op e (OBJECT x) 	= f op e x
 
 generic gReduceRSt t :: .t .st -> .st
 gReduceRSt{|c|} x st 					= st
+gReduceRSt{|UNIT|} x st 				= st
 gReduceRSt{|PAIR|} fx fy (PAIR x y) st 	= fx x (fy y st)
 gReduceRSt{|EITHER|} fl fr x st 		= reduceEITHER fl fr x st
 gReduceRSt{|CONS|} f (CONS x) st 		= f x st
@@ -22,6 +23,7 @@ gReduceRSt{|OBJECT|} f (OBJECT x) st 	= f x st
 
 generic gReduceLSt t :: .t .st -> .st
 gReduceLSt{|c|} x st 					= st
+gReduceLSt{|UNIT|} x st 				= st
 gReduceLSt{|PAIR|} fx fy (PAIR x y) st 	= fy y (fx x st)
 gReduceLSt{|EITHER|} fl fr x st 		= reduceEITHER fl fr x st
 gReduceLSt{|CONS|} f (CONS x) st 		= f x st
