@@ -20,7 +20,7 @@ gCollectFreeVars {|CONS|} f (CONS x) 		= f x
 gCollectFreeVars {|FIELD|} f (FIELD x) 		= f x
 gCollectFreeVars {|OBJECT|} f (OBJECT x) 	= f x
 gCollectFreeVars {|Expr|} (ELambda v x) 	= filter ((<>) v) (gCollectFreeVars{|*|} x)
-gCollectFreeVars {|Expr|} (EApp x y) 		= gCollectFreeVars{|*|} (PAIR x y)
+gCollectFreeVars {|Expr|} (EApp x y) 		= removeDup (gCollectFreeVars{|*|} x ++ gCollectFreeVars{|*|} y)
 gCollectFreeVars {|Expr|} (EVar x) 			= gCollectFreeVars{|*|} x
 
 collectFreeVars = gCollectFreeVars{|*|} 
