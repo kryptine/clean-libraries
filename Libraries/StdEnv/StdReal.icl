@@ -7,7 +7,7 @@ implementation module StdReal
 import StdClass
 import StdOverloaded,StdInt,StdArray
 from StdBool import &&,||,not
-from StdChar import instance == Char, class ==(..)
+from StdChar import instance == Char, instance < Char, class ==(..)
 
 instance + Real
 where
@@ -254,41 +254,71 @@ where
 	//	otherwise
 			= 	val
  where
-	len
-		=	size s
-	signedval
-		= 	toReal2 s 1 0.0 False 1.0 False 0 0
-	val
-		=	toReal2 s 0 0.0 False 1.0 False 0 0
-	first
-		=	s.[0]
+	len = size s
+	first = s.[0]
+	signedval = toReal1 s 1 0.0
+	val = toReal1 s 0 0.0
 
-	toReal2 s posn val dec_new dval exp eneg eval
+	toReal1 :: !{#Char} !Int !Real -> Real
+	toReal1 s posn val
 		| posn == len
-			= 	val*dval*10.0 ^  toReal (eneg*eval)
-		| digit && not dec_new && not exp
-			= 	toReal2 s (posn+1) (toReal n + 10.0*val) dec_new dval exp eneg eval
-		| digit && dec_new && not exp
-			= 	toReal2 s (posn+1) (toReal n + 10.0*val) dec_new (dval/10.0) exp eneg eval
-		| digit && exp
-			= 	toReal2 s (posn+1) val dec_new dval exp eneg (n + 10*eval )
-		| not dec_new && not exp && c == '.'
-			= 	toReal2 s (posn+1) val True 1.0 exp eneg eval
-		| not exp && (c== 'e' || c== 'E')
+			= 	val
+		| digit
+			= 	toReal1 s (posn+1) (toReal n + 10.0*val)
+		| c == '.'
+			= 	toRealWithDot s (posn+1) val 0
+		| c== 'e' || c== 'E'
 			| posn<len-2 && s.[posn+1] == '-'
-				= 	toReal2 s (posn+2) val dec_new dval True (-1) 0
+				= 	toRealWithExp s (posn+2) val 0 (-1) 0
 			| posn<len-2 && s.[posn+1] == '+'
-				= 	toReal2 s (posn+2) val dec_new dval True (+1) 0
+				= 	toRealWithExp s (posn+2) val 0 (+1) 0
 			| posn<len-1
-				= 	toReal2 s (posn+1) val dec_new dval True 1 0 
-			// otherwise
+				= 	toRealWithExp s (posn+1) val 0 1 0 
 				= 	0.0
-		// otherwise
 			= 	0.0
 		where
 			c		=	s.[posn]
 			n		=	toInt c  -  toInt '0' 
-			digit	=	0<=n  &&  n<=9 
+			digit	=	c>='0' && c<='9'
+
+	toRealWithDot :: !{#Char} !Int !Real !Int -> Real
+	toRealWithDot s posn val dn
+		| posn == len
+			| dn==0
+				= 	val
+				= 	val / (10.0 ^ toReal dn)
+		| digit
+				= 	toRealWithDot s (posn+1) (toReal n + 10.0*val) (dn+1)
+		| c== 'e' || c== 'E'
+			| posn<len-2 && s.[posn+1] == '-'
+				= 	toRealWithExp s (posn+2) val dn (-1) 0
+			| posn<len-2 && s.[posn+1] == '+'
+				= 	toRealWithExp s (posn+2) val dn (+1) 0
+			| posn<len-1
+				= 	toRealWithExp s (posn+1) val dn 1 0 
+				= 	0.0
+			= 	0.0
+		where
+			c		=	s.[posn]
+			n		=	toInt c  -  toInt '0' 
+			digit	=	c>='0' && c<='9'
+
+	toRealWithExp :: !{#Char} !Int !Real !Int !Int !Int -> Real
+	toRealWithExp s posn val dn eneg eval
+		| posn == len
+			# e = eneg*eval-dn
+			| e>=0
+				= 	val * 10.0 ^ toReal e
+			| e>= -308
+				=	val / 10.0 ^ toReal (~e)
+				=	(val / 5.0 ^ toReal (~e)) / 2.0 ^ toReal (~e)
+		| digit
+			= 	toRealWithExp s (posn+1) val dn eneg (n + 10*eval)
+			= 	0.0
+		where
+			c		=	s.[posn]
+			n		=	toInt c  -  toInt '0' 
+			digit	=	c>='0' && c<='9'
 
 entier :: !Real -> Int
 entier a
