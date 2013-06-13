@@ -198,14 +198,14 @@ ea_Conssts
 
 .export _Consi _Consr _Consc _Consb _Consf
 .record _Consi lia 1 1 "[#Int]"
-.record _Consr lra 1 2 "[#Real]"
+.record _Consr lra 1 1 "[#Real]"
 .record _Consc lca 1 1 "[#Char]"
 .record _Consb lba 1 1 "[#Bool]"
 .record _Consf lfa 1 2 "[#File]"
 
 .export _Consits _Consrts _Conscts _Consbts _Consfts
 .record _Consits lia 1 1 "[#Int!]"
-.record _Consrts lra 1 2 "[#Real!]"
+.record _Consrts lra 1 1 "[#Real!]"
 .record _Conscts lca 1 1 "[#Char!]"
 .record _Consbts lba 1 1 "[#Bool!]"
 .record _Consfts lfa 1 2 "[#File!]"
@@ -1197,11 +1197,9 @@ _print_ul_char
 
 _print_ul_real
 	pop_b	1
-	push_b	2
-	push_b	2
-	update_b	2 4
-	update_b	1 3
-	updatepop_b	0 2
+	push_b	1
+	update_b	1 2
+	updatepop_b	0 1
 
 	print_real
 
@@ -1469,12 +1467,10 @@ _print_ar_char
 
 _print_ar_real
 	pop_b	1
-	push_b	2
-	push_b	2
-	update_b	2 4
-	update_b	1 3
-	update_b	0 2
-	pop_b	2
+	push_b	1
+	update_b	1 2
+	update_b	0 1
+	pop_b	1
 
 	print_real
 
@@ -1986,15 +1982,15 @@ _eval_unboxed_list_lp1
 _eval_ul_next_field
 _eval_unboxed_list_lp2
 	eqC_b	'i' 0
-	jmp_true	_eval_ul_int_char_or_bool
+	jmp_true	_eval_ul_int_char_bool_or_real
 	eqC_b	'c' 0
-	jmp_true	_eval_ul_int_char_or_bool
+	jmp_true	_eval_ul_int_char_bool_or_real
 	eqC_b	'r' 0
-	jmp_true	_eval_ul_real_or_file
+	jmp_true	_eval_ul_int_char_bool_or_real
 	eqC_b	'b' 0
-	jmp_true	_eval_ul_int_char_or_bool
+	jmp_true	_eval_ul_int_char_bool_or_real
 	eqC_b	'f' 0
-	jmp_true	_eval_ul_real_or_file
+	jmp_true	_eval_ul_file
 	eqC_b	'a' 0
 	jmp_true	_eval_ul_graph
 	eqC_b	'(' 0
@@ -2005,12 +2001,12 @@ _eval_unboxed_list_lp2
 	jmp_true	_eval_ul_skip_char
 	halt
 
-_eval_ul_int_char_or_bool
+_eval_ul_int_char_bool_or_real
 	pop_b	1
 	updatepop_b	0 1
 	jmp	_eval_rest_unboxed_list
 
-_eval_ul_real_or_file
+_eval_ul_file
 	pop_b	1
 	updatepop_b	0 2
 	jmp	_eval_rest_unboxed_list
