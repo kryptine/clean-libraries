@@ -1778,12 +1778,10 @@ _print_r_char
 
 _print_r_real
 	pop_b	1
-	push_b	2
-	push_b	2
-	update_b	2 4
-	update_b	1 3
-	update_b	0 2
-	pop_b	2
+	push_b	1
+	update_b	1 2
+	update_b	0 1
+	pop_b	1
 
 	print_real
 
@@ -2284,6 +2282,7 @@ _eval_record_lp_
 _eval_r_char
 _eval_r_bool
 _eval_r_integer
+_eval_r_real
 	pop_b	1
 	update_b	0 1
 	pop_b	1
@@ -2291,7 +2290,6 @@ _eval_r_integer
 	jmp	_eval_record_lp
 
 _eval_r_file
-_eval_r_real
 	pop_b	1
 	update_b	0 2
 	pop_b	2
