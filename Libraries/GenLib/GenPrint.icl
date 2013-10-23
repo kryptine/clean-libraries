@@ -59,7 +59,6 @@ foldSt f [x:xs] 	= foldSt f xs o f x
 :: Context 
 	= CtxNone										// initial env
 	| CtxNullary									// nullary constructor
-	| CtxRecord										// record constructor	
 	| CtxTuple										// tuple constructor
 	| CtxNonfix										// normal nonfix constructor
 	| CtxInfix 										// infix constructor
@@ -75,17 +74,14 @@ instance == GenConsAssoc where
 	(==) GenConsAssocRight GenConsAssocRight = True
 	(==) _ _ = False
 
-mkContext :: GenericConsDescriptor -> Context
-mkContext {gcd_prio=GenConsNoPrio, gcd_fields, gcd_name, gcd_arity}
-	| isEmpty gcd_fields 
-		| gcd_arity == 0
-			= CtxNullary
-		| is_tuple gcd_name
-			= CtxTuple
-		| otherwise
-			= CtxNonfix
-	| otherwise	
-		= CtxRecord 
+mkContextCons :: GenericConsDescriptor -> Context
+mkContextCons {gcd_prio=GenConsNoPrio, gcd_name, gcd_arity}
+	| gcd_arity == 0
+		= CtxNullary
+	| is_tuple gcd_name
+		= CtxTuple
+	| otherwise
+		= CtxNonfix
 where
 	is_tuple name 
 		#! size_name = size name
@@ -107,16 +103,13 @@ needParenthesis CtxNone outer_ctx 		= abort "needParenthesis: this_ctx = CtxNone
 needParenthesis this_ctx CtxNullary		= abort "needParenthesis: outer_ctx = CtxNullary"
 needParenthesis CtxNullary outer_ctx 	= False
 needParenthesis CtxTuple outer_ctx 		= True		// the tuple parenthesis
-needParenthesis CtxRecord outer_ctx 	= False
 needParenthesis CtxNonfix CtxNone		= False
 needParenthesis CtxNonfix CtxTuple		= False
-needParenthesis CtxNonfix CtxRecord		= False
 needParenthesis CtxNonfix CtxNonfix		= True
 needParenthesis CtxNonfix (CtxInfix _ _ _ _) = False
 needParenthesis (CtxInfix _ _ _ _) CtxNone = False
 needParenthesis (CtxInfix _ _ _ _) CtxNullary = True
 needParenthesis (CtxInfix _ _ _ _) CtxTuple = False
-needParenthesis (CtxInfix _ _ _ _) CtxRecord = False
 needParenthesis (CtxInfix _ _ _ _) CtxNonfix = True // False // PK
 needParenthesis (CtxInfix _ this_assoc this_prio _) (CtxInfix _ outer_assoc outer_prio branch) 
 	= 	outer_prio > this_prio 
@@ -207,8 +200,6 @@ gPrint{|PAIR|} fx fy (PAIR x y) st=:{ps_context = CtxNullary}
 	= abort "gOutput{|PAIR|}: CtxNullary\n" 
 gPrint{|PAIR|} fx fy (PAIR x y) st=:{ps_context = CtxTuple}
 	= fx x $ printString ", " $ fy y @ st
-gPrint{|PAIR|} fx fy (PAIR x y) st=:{ps_context = CtxRecord}
-	= fx x $ printString ", " $ fy y @ st
 gPrint{|PAIR|} fx fy (PAIR x y) st=:{ps_context = CtxNonfix}
 	= fx x $ printChar ' ' $ fy y @ st	
 gPrint{|PAIR|} fx fy (PAIR x y) st=:{ps_context = CtxInfix name assoc prio branch} 
@@ -218,7 +209,7 @@ gPrint{|PAIR|} fx fy (PAIR x y) st=:{ps_context = CtxInfix name assoc prio branc
 	= {st & ps_context = CtxInfix name assoc prio branch} 
 
 gPrint{|CONS of d|} print_arg (CONS x) st=:{ps_context}
-	#! ctx = mkContext d
+	#! ctx = mkContextCons d
 	#! st = { st & ps_context = ctx }
 	| needParenthesis ctx ps_context
 		= 	{ printChar '(' 
@@ -236,18 +227,20 @@ where
 		= printStringLiteral d.gcd_name 
 	print print_arg CtxTuple
 		= print_arg x
-	print print_arg CtxRecord 		
-		= printString "{ " 
-		$ foldSt printChar (tl [c\\c<-:d.gcd_name]) //printStringLiteral d.gcd_name 
-		$ printString " | "
-		$ print_arg x
-		$ printString " }"
 	print print_arg CtxNonfix		
 		= printStringLiteral d.gcd_name
 		$ printChar ' '
 		$ print_arg x 
 	print print_arg (CtxInfix _ _ _ _)  		
 		= print_arg x
+
+gPrint{|RECORD of d|} print_arg (RECORD x) st
+	= printString "{ " 
+		$ foldSt printChar (tl [c\\c<-:d.grd_name]) //printStringLiteral d.grd_name 
+		$ printString " | "
+		$ print_arg x
+		$ printString " }"
+		@ st
 
 gPrint{|FIELD of d|} f (FIELD x) st
 	= printStringLiteral d.gfd_name
@@ -300,7 +293,3 @@ printToString :: a -> String | gPrint{|*|} a
 printToString x
 	# string_output = (mkStringPrintState <<- x).ps_output
 	= string_output.so_str % (0,string_output.so_pos-1)
-
-//-------------------------------------------------------------------------------------
-
-//Start = 1
