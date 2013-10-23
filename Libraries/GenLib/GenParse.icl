@@ -576,24 +576,15 @@ gParse{|EITHER|} fl fr expr
 gParse{|CONS of d|} parse_arg expr
 	| d.gcd_arity == 0 	
 		= parse_nullary expr
-	| isEmpty d.gcd_fields
-		| is_tuple d.gcd_name
-			= parse_tuple expr	
-		| otherwise
-			= case d.gcd_prio of
-				GenConsNoPrio			
-					-> parse_nonfix expr
-				GenConsPrio assoc prio 	
-					-> parse_infix assoc prio expr 						
+	| is_tuple d.gcd_name
+		= parse_tuple expr	
 	| otherwise
-		= parse_record expr	
+		= case d.gcd_prio of
+			GenConsNoPrio			
+				-> parse_nonfix expr
+			GenConsPrio assoc prio 	
+				-> parse_infix assoc prio expr 						
 where
-	mkprod [] 		= abort "mkprod\n"
-	mkprod [expr] 	= expr
-	mkprod exprs 	
-		# (xs, ys) = splitAt (length exprs / 2) exprs
-		= ExprPair (mkprod xs) (mkprod ys) 
-	
 	parse_nullary (ExprIdent name)
 		| name == d.gcd_name
 			= mapMaybe CONS (parse_arg ExprUnit)
@@ -622,15 +613,6 @@ where
 		= mapMaybe CONS (parse_arg (mkprod [e\\e<-:exprs]))
 	parse_tuple expr = Nothing
 	
-	parse_record (ExprRecord rec_name exprs) 
-		| check_name rec_name d.gcd_name
-			= mapMaybe CONS (parse_arg (mkprod [e\\e<-:exprs]))
-			= Nothing
-	where
-		check_name Nothing cons_name = True
-		check_name (Just rec_name) cons_name = rec_name == cons_name
-	parse_record expr = Nothing
-
 	parse_infix this_assoc this_prio (ExprApp exprs)
 		= parse_infix1 this_assoc this_prio exprs
 	parse_infix this_assoc this_prio (ExprAppInInfix exprs outer_assoc outer_prio branch)
@@ -697,6 +679,22 @@ where
 		&& isDigit name.[6]
 		&& (size_name == 7 || isDigit name.[7])
 
+gParse{|RECORD of d|} parse_arg (ExprRecord rec_name exprs)
+	| check_name rec_name d.grd_name
+		= mapMaybe RECORD (parse_arg (mkprod [e\\e<-:exprs]))
+		= Nothing
+	where
+		check_name Nothing cons_name = True
+		check_name (Just rec_name) cons_name = rec_name == cons_name
+gParse{|RECORD of d|} parse_arg expr
+	= Nothing
+
+mkprod [] 		= abort "mkprod\n"
+mkprod [expr] 	= expr
+mkprod exprs 	
+	# (xs, ys) = splitAt (length exprs / 2) exprs
+	= ExprPair (mkprod xs) (mkprod ys)
+	
 gParse{|FIELD of d|} parse_arg (ExprField name value) 
 	| d.gfd_name == name
 		= mapMaybe FIELD (parse_arg value)
@@ -748,7 +746,7 @@ parseFile file = gParse{|*|} (preParseFile file)
 //Start = preParseString "{A B D,X Y Z,I J K}"
 
 //----------------------------------------------------------------------------------		
-
+/*
 :: Tree a b = Tip a | Bin b (Tree a b) (Tree a b)
 :: T
 	= :+: infixl 2 T T
@@ -761,7 +759,7 @@ parseFile file = gParse{|*|} (preParseFile file)
 
 derive gParse (,), (,,), (,,,), Tree, T, Rec
 derive bimap Maybe, ParseState, []
-
+*/
 //Start :: Maybe T
 //Start = parseString "U :+: U :+: U"
 
