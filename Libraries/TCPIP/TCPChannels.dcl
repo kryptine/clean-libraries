@@ -93,9 +93,9 @@ tcpPossible		:: !*env
 //	multiplexing
 //	********************************************************************************
 
-selectChannel_MT:: !(Maybe Timeout)          !*r_channels !*s_channels !*World
-				-> (![(!Int, !SelectResult)],!*r_channels,!*s_channels,!*World)
-				|  SelectReceive r_channels & SelectSend s_channels
+selectChannel_MT:: !(Maybe Timeout)          !*r_channels !*s_channels !*env
+				-> (![(!Int, !SelectResult)],!*r_channels,!*s_channels,!*env)
+				|  SelectReceive r_channels & SelectSend s_channels & ChannelEnv env
 /*	selectChannel_MT mbTimeout r_channels s_channels world
 		determines the first channel on which "something happens". 
 		If the result is an empty list, then the timeout expired, otherwise each 
@@ -117,8 +117,8 @@ instance toString SelectResult
 class SelectReceive channels where
 	accRChannels	:: (PrimitiveRChannel -> (x, PrimitiveRChannel)) !*channels
 					-> (![x], !*channels)
-	getRState		:: !Int !*channels !*World
-					-> (!Maybe SelectResult, !*channels, !*World)
+	getRState		:: !Int !*channels !*env
+					-> (!Maybe SelectResult, !*channels, !*env) | ChannelEnv env
 /*	accRChannels f channels
 		applies a function on each channel in channels and returns a list which
 		contains the result for each application.
@@ -130,8 +130,8 @@ class SelectReceive channels where
 class SelectSend channels where
 	accSChannels	:: (TCP_SChannel -> *(.x, TCP_SChannel)) !*channels
 					-> (![.x], !*channels)
-	appDisconnected	:: !Int !*channels !*World
-					-> (!Bool, !*channels, !*World)
+	appDisconnected	:: !Int !*channels !*env
+					-> (!Bool, !*channels, !*env) | ChannelEnv env
 /*	accSChannels
 		applies a function on each channel in channels and returns a list which
 		contains the result for each application.

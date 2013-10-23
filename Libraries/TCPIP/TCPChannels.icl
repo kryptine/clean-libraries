@@ -305,15 +305,15 @@ class SelectReceive channels
   where
 	accRChannels	:: (PrimitiveRChannel -> (x, PrimitiveRChannel)) !*channels 
 					-> (![x], !*channels)
-	getRState		:: !Int !*channels !*World
-					-> (!Maybe SelectResult, !*channels, !*World)
+	getRState		:: !Int !*channels !*env
+					-> (!Maybe SelectResult, !*channels, !*env) | ChannelEnv env
 
 class SelectSend channels
   where
 	accSChannels	:: (TCP_SChannel -> *(.x, TCP_SChannel)) !*channels
 					-> (![.x], !*channels)
-	appDisconnected	:: !Int !*channels !*World
-					-> (!Bool, !*channels, !*World)
+	appDisconnected	:: !Int !*channels !*env
+					-> (!Bool, !*channels, !*env) | ChannelEnv env
 
 class getNrOfChannels channels	:: !*channels
 								-> (!Int, !*channels)
@@ -498,9 +498,9 @@ instance toString SelectResult
   	toString SR_Sendable		= "SR_Sendable"
   	toString SR_Disconnected	= "SR_Disconnected"
 
-selectChannel_MT		:: !(Maybe Timeout) !*r_channels !*s_channels !*World
-					-> (![(!Int, !SelectResult)], !*r_channels, !*s_channels, !*World) 
-					|	SelectReceive r_channels & SelectSend s_channels
+selectChannel_MT		:: !(Maybe Timeout) !*r_channels !*s_channels !*env
+					-> (![(!Int, !SelectResult)], !*r_channels, !*s_channels, !*env) 
+					|	SelectReceive r_channels & SelectSend s_channels & ChannelEnv env
 selectChannel_MT mbTimeout r_channels s_channels env
 	|	isJust mbTimeout && fromJust mbTimeout<0
 		= ([], r_channels, s_channels, env)
