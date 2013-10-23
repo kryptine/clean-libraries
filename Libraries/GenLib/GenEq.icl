@@ -14,6 +14,7 @@ gEq{|EITHER|} fl fr (LEFT x) (LEFT y) 		= fl x y
 gEq{|EITHER|} fl fr (RIGHT x) (RIGHT y) 	= fr x y
 gEq{|EITHER|} fl fr 	_ _ 				= False
 gEq{|CONS|} f (CONS x) (CONS y) 			= f x y
+gEq{|RECORD|} f (RECORD x) (RECORD y) 		= f x y
 gEq{|FIELD|} f (FIELD x) (FIELD y) 			= f x y
 gEq{|OBJECT|} f (OBJECT x) (OBJECT y) 		= f x y
 gEq{|{}|} f xs ys 							= eqArray f xs ys
