@@ -5,7 +5,7 @@ import StdMaybe
 
 import	TCPDef,TCPChannelClass
 import	tcp
-import	code from "cTCP_121.", library "wsock_library"
+import	code from "cTCP_121."
 
 os_eom :: !EndpointRef !*env -> (!Bool, !*env)
 os_eom er e
