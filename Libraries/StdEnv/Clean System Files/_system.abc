@@ -926,9 +926,7 @@ e_system_nAP
 .o 2 0
 ea_AP
 	jsr_eval 0
-.d 2 0
-	jsr	e_system_sAP
-.o 1 0
+	jsr_ap 1
 	fill_a	0 1
 	pop_a	1
 .d 1 0
