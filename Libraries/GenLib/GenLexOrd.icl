@@ -40,6 +40,7 @@ gLexOrd{|EITHER|} fl fr (RIGHT x) (RIGHT y) = fr x y
 gLexOrd{|CONS|} f (CONS x) (CONS y) = f x y
 gLexOrd{|FIELD|} f (FIELD x) (FIELD y) = f x y
 gLexOrd{|OBJECT|} f (OBJECT x) (OBJECT y) = f x y
+gLexOrd{|RECORD|} f (RECORD x) (RECORD y) = f x y
 
 // Instance on standard lists is needed because
 // standard lists have unnatural internal ordering of constructors: Cons < Nil,
@@ -48,7 +49,11 @@ gLexOrd{|OBJECT|} f (OBJECT x) (OBJECT y) = f x y
 gLexOrd{|[]|} f [] [] = EQ
 gLexOrd{|[]|} f [] _  = LT
 gLexOrd{|[]|} f _ []  = GT
-gLexOrd{|[]|} f [x:xs] [y:ys] = gLexOrd{|*->*->*|} f (gLexOrd{|*->*|} f) (PAIR x xs) (PAIR y ys)
+gLexOrd{|[]|} f [x:xs] [y:ys]
+	= case f x y of
+		 	EQ -> gLexOrd{|*->*|} f xs ys
+		 	LT -> LT
+		 	GT -> GT
 
 gLexOrd{|{}|} f xs ys 	= lexOrdArray f xs ys 
 gLexOrd{|{!}|} f xs ys 	= lexOrdArray f xs ys 
