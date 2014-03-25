@@ -59,6 +59,7 @@ foldSt f [x:xs] 	= foldSt f xs o f x
 :: Context 
 	= CtxNone										// initial env
 	| CtxNullary									// nullary constructor
+	| CtxRecord										// record constructor	
 	| CtxTuple										// tuple constructor
 	| CtxNonfix										// normal nonfix constructor
 	| CtxInfix 										// infix constructor
@@ -200,6 +201,8 @@ gPrint{|PAIR|} fx fy (PAIR x y) st=:{ps_context = CtxNullary}
 	= abort "gOutput{|PAIR|}: CtxNullary\n" 
 gPrint{|PAIR|} fx fy (PAIR x y) st=:{ps_context = CtxTuple}
 	= fx x $ printString ", " $ fy y @ st
+gPrint{|PAIR|} fx fy (PAIR x y) st=:{ps_context = CtxRecord}
+	= fx x $ printString ", " $ fy y @ st
 gPrint{|PAIR|} fx fy (PAIR x y) st=:{ps_context = CtxNonfix}
 	= fx x $ printChar ' ' $ fy y @ st	
 gPrint{|PAIR|} fx fy (PAIR x y) st=:{ps_context = CtxInfix name assoc prio branch} 
@@ -234,13 +237,16 @@ where
 	print print_arg (CtxInfix _ _ _ _)  		
 		= print_arg x
 
-gPrint{|RECORD of d|} print_arg (RECORD x) st
-	= printString "{ " 
-		$ foldSt printChar (tl [c\\c<-:d.grd_name]) //printStringLiteral d.grd_name 
+gPrint{|RECORD of d|} print_arg (RECORD x) st=:{ps_context}
+	#! st = {st & ps_context = CtxRecord}
+	= { printString "{ "
+		$ printStringLiteral d.grd_name 
 		$ printString " | "
 		$ print_arg x
 		$ printString " }"
 		@ st
+		& ps_context = ps_context
+	  }
 
 gPrint{|FIELD of d|} f (FIELD x) st
 	= printStringLiteral d.gfd_name
