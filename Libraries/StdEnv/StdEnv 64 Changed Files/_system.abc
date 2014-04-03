@@ -16,6 +16,7 @@
 .export	_Tuple
 .export	_Select _select_code
 .export	_Nil _Cons
+.export e__predef_d_Unit
 
 .export	e_system_dAP e_system_nAP e_system_eaAP e_system_dind
 .export	e_system_dif e_system_lif e_system_sif e_system_nif e_system_eaif
@@ -54,6 +55,8 @@
 .desc _Cons	_hnf	l_Cons	2	0 "Cons"
 
 .record FILE ii 0 2 "File"
+
+.desc e__predef_d_Unit _hnf _hnf 0 0 "_Unit"
 
 .desc e_system_dAP	_hnf	e_system_lAP	2 0	"AP"
 .desc e_system_dif	e_system_nif	e_system_lif	3 0	"if"
@@ -1105,7 +1108,8 @@ _print_last
 	jmp_true	_print__array_
 	eq_desc	_STRING_ 0 0
 	jmp_true	_print_char_array
-
+	eq_desc	e__predef_d_Unit 0 0
+	jmp_true	_print_unit
 	print_symbol_sc	0
 	pop_a	1	| remove node
 _print_brackets
@@ -1671,6 +1675,11 @@ _print_real_array_lp2
 					
 _print_nil
 	print_sc	"[]"
+	pop_a	1
+	jmp	_print_brackets
+
+_print_unit
+	print_sc	"()"
 	pop_a	1
 	jmp	_print_brackets
 
