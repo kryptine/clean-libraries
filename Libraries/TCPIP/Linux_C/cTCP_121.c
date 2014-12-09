@@ -164,6 +164,13 @@ void openTCP_ListenerC (int portNum, int *pErrCode, SOCKET *pEndpointRef)
 	srvAdr.sin_addr.s_addr = INADDR_ANY;	/* internet address will be given after "accept" */
 	srvAdr.sin_port = htons((short int)portNum);
 	
+    int so_reuseaddr = 1;
+	*pErrCode = setsockopt (s, SOL_SOCKET, SO_REUSEADDR, &so_reuseaddr, sizeof so_reuseaddr);
+	if (*pErrCode){
+		close (s);
+		return;
+	}
+
 	*pErrCode = bind (s, (struct sockaddr*) &srvAdr, sizeof(srvAdr));
 	if (*pErrCode){
 		close (s);
