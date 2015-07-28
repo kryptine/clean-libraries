@@ -129,8 +129,10 @@ Int *copy_graph_to_string (Int *node_p,void *begin_free_heap,void *end_free_heap
 						} else if (desc==(Int)&__ARRAY__+2){
 							Int array_size,elem_desc;
 
-							if (heap_p+2>(Int*)stack_begin)
+							if (heap_p+2>(Int*)stack_begin){
+								*node_p=desc;
 								return NULL;
+							}
 
 							array_size=node_p[1];
 							elem_desc=node_p[2];
@@ -143,8 +145,10 @@ Int *copy_graph_to_string (Int *node_p,void *begin_free_heap,void *end_free_heap
 							if (elem_desc==0){
 								stack_p-=array_size;
 								if (stack_p<stack_begin){
-									if ((Int*)stack_p<heap_p)
+									if ((Int*)stack_p<heap_p){
+										node_p[-3]=desc;
 										return NULL;
+									}
 									stack_begin=stack_p;
 								}
 								
@@ -194,8 +198,10 @@ Int *copy_graph_to_string (Int *node_p,void *begin_free_heap,void *end_free_heap
 								if (n_field_pointers==0){
 									array_size*=field_size;
 									
-									if (heap_p+array_size>(Int*)stack_begin)
+									if (heap_p+array_size>(Int*)stack_begin){
+										node_p[-3]=desc;
 										return NULL;
+									}
 									
 									copy (heap_p,node_p,array_size);
 									heap_p+=array_size;
@@ -205,8 +211,10 @@ Int *copy_graph_to_string (Int *node_p,void *begin_free_heap,void *end_free_heap
 
 									stack_p-=array_size;
 									if (stack_p<stack_begin){
-										if ((Int*)stack_p<heap_p)
+										if ((Int*)stack_p<heap_p){
+											node_p[-3]=desc;
 											return NULL;
+										}
 										stack_begin=stack_p;
 									}
 									
@@ -220,13 +228,17 @@ Int *copy_graph_to_string (Int *node_p,void *begin_free_heap,void *end_free_heap
 									n_array_pointers=n_field_pointers*array_size;
 									n_array_non_pointers=n_non_field_pointers*array_size;
 									
-									if (heap_p+n_array_non_pointers>(Int*)stack_begin)
+									if (heap_p+n_array_non_pointers>(Int*)stack_begin){
+										node_p[-3]=desc;
 										return NULL;
+									}
 									
 									stack_p-=n_array_pointers;
 									if (stack_p<stack_begin){
-										if ((Int*)stack_p<heap_p+n_array_non_pointers)
+										if ((Int*)stack_p<heap_p+n_array_non_pointers){
+											node_p[-3]=desc;
 											return NULL;
+										}
 										stack_begin=stack_p;
 									}
 									
@@ -252,8 +264,10 @@ Int *copy_graph_to_string (Int *node_p,void *begin_free_heap,void *end_free_heap
 						continue;
 					} else if (arity==2){
 						if (stack_p<=stack_begin){
-							if ((Int*)stack_p<=heap_p)
+							if ((Int*)stack_p<=heap_p){
+								*node_p=desc;
 								return NULL;
+							}
 							--stack_begin;
 						}
 
@@ -268,8 +282,10 @@ Int *copy_graph_to_string (Int *node_p,void *begin_free_heap,void *end_free_heap
 						
 						stack_p-=n_words;
 						if (stack_p<stack_begin){
-							if ((Int*)stack_p<heap_p)
+							if ((Int*)stack_p<heap_p){
+								*node_p=desc;
 								return NULL;
+							}
 							stack_begin=stack_p;
 						}
 						
@@ -316,8 +332,10 @@ Int *copy_graph_to_string (Int *node_p,void *begin_free_heap,void *end_free_heap
 									*heap_p++=node_p[2];
 								} else {
 									if (stack_p<=stack_begin){
-										if ((Int*)stack_p<=heap_p)
+										if ((Int*)stack_p<=heap_p){
+											*node_p=desc;
 											return NULL;
+										}
 										--stack_begin;
 									}
 
@@ -363,8 +381,10 @@ Int *copy_graph_to_string (Int *node_p,void *begin_free_heap,void *end_free_heap
 								if (n_pointers>0){
 									stack_p-=n_pointers;
 									if (stack_p<stack_begin){
-										if ((Int*)stack_p<heap_p)
+										if ((Int*)stack_p<heap_p){
+											*node_p=desc;
 											return NULL;
+										}
 										stack_begin=stack_p;
 									}
 									
@@ -389,8 +409,10 @@ Int *copy_graph_to_string (Int *node_p,void *begin_free_heap,void *end_free_heap
 							
 							stack_p-=n_words;
 							if (stack_p<stack_begin){
-								if ((Int*)stack_p<heap_p)
+								if ((Int*)stack_p<heap_p){
+									*node_p=desc;
 									return NULL;
+								}
 								stack_begin=stack_p;
 							}
 							
@@ -426,8 +448,10 @@ Int *copy_graph_to_string (Int *node_p,void *begin_free_heap,void *end_free_heap
 									
 									stack_p-=n_pointers;
 									if (stack_p<stack_begin){
-										if ((Int*)stack_p<heap_p)
+										if ((Int*)stack_p<heap_p){
+											*node_p=desc;
 											return NULL;
+										}
 										stack_begin=stack_p;
 									}
 									
