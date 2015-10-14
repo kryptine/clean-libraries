@@ -227,7 +227,7 @@ void openTCP_ListenerC(int portNum, int *pErrCode, SOCKET *pEndpointRef)
 		return;
 		};
 
-	*pErrCode = listen(s,5);
+	*pErrCode = listen (s,128);
 	if (*pErrCode) {
 		closesocket(s);
 		return;
