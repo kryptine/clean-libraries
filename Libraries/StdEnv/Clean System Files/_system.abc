@@ -31,8 +31,6 @@
 .export	n_Sr.1 n_Sr.2 n_Sr.3 n_Sr.4 n_Sr.5 n_Sr.6
 .export	ea_Sr.1 ea_Sr.2 ea_Sr.3 ea_Sr.4 ea_Sr.5 ea_Sr.6
 
-.export	_ind
-
 || don't change the order of the following 9 descriptors
 
 |.desc CHANNEL	_channel_code	_hnf	1	""
