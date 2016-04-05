@@ -1,7 +1,7 @@
 
 .globl	copy_graph_to_string
 .globl	remove_forwarding_pointers_from_graph
-.globl	collect_1l
+.globl	collect_1
 
 	.text
 
