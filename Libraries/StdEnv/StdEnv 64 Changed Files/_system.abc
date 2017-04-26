@@ -2153,7 +2153,7 @@ _eval_last_unboxed_list
 	rtn
 
 _eval__array_
-.d 1 1 i
+.d 1 0
 	jmp	_eval__array2
 
 _eval_array
@@ -2165,6 +2165,7 @@ _eval_array
 _eval__array
 	eq_desc	_STRING_ 0 0
 	jmp_true	_eval_char_array
+.o 1 0
 _eval__array2
 	push_r_args_b	0 0 2 2 1
 
