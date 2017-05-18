@@ -100,17 +100,17 @@ mkContext {gcd_prio=GenConsPrio assoc prio, gcd_name}
 	= CtxInfix gcd_name assoc prio GenConsAssocNone
 
 needParenthesis :: Context Context -> Bool
-needParenthesis CtxNone outer_ctx 		= abort "needParenthesis: this_ctx = CtxNone"
 needParenthesis this_ctx CtxNullary		= abort "needParenthesis: outer_ctx = CtxNullary"
 needParenthesis CtxNullary outer_ctx 	= False
 needParenthesis CtxTuple outer_ctx 		= True		// the tuple parenthesis
 needParenthesis CtxNonfix CtxNone		= False
 needParenthesis CtxNonfix CtxTuple		= False
+needParenthesis CtxNonfix CtxRecord		= False
 needParenthesis CtxNonfix CtxNonfix		= True
 needParenthesis CtxNonfix (CtxInfix _ _ _ _) = False
 needParenthesis (CtxInfix _ _ _ _) CtxNone = False
-needParenthesis (CtxInfix _ _ _ _) CtxNullary = True
 needParenthesis (CtxInfix _ _ _ _) CtxTuple = False
+needParenthesis (CtxInfix _ _ _ _) CtxRecord = False
 needParenthesis (CtxInfix _ _ _ _) CtxNonfix = True // False // PK
 needParenthesis (CtxInfix _ this_assoc this_prio _) (CtxInfix _ outer_assoc outer_prio branch) 
 	= 	outer_prio > this_prio 
