@@ -127,12 +127,13 @@ printChar ch s=:{ps_output}
  	= {s & ps_output = ps_output}
 
 printCharLiteral '\\' 	= printChar '\\' $ printChar '\\'
-printCharLiteral '\n' 	= printChar '\\' $ printChar '\n'
-printCharLiteral '\t' 	= printChar '\\' $ printChar '\t'
-printCharLiteral '\b'	= printChar '\\' $ printChar '\b'
+printCharLiteral '\n' 	= printChar '\\' $ printChar 'n'
+printCharLiteral '\t' 	= printChar '\\' $ printChar 't'
+printCharLiteral '\r' 	= printChar '\\' $ printChar 'r'
+printCharLiteral '\b'	= printChar '\\' $ printChar 'b'
 printCharLiteral '\'' 	= printChar '\\' $ printChar '\''
-printCharLiteral '\"' 	= printChar '\\' $ printChar '\"'
-printCharLiteral '\0' 	= printChar '\\' $ printChar '\0'
+printCharLiteral '\"' 	= printChar '\\' $ printChar '"'
+printCharLiteral '\0' 	= printChar '\\' $ printChar '0'
 printCharLiteral c 		= printChar c
 
 printString str
