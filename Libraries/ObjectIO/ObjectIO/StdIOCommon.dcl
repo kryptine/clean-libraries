@@ -11,7 +11,7 @@ definition module StdIOCommon
 import	StdOverloaded, StdString
 import	StdBitmap, StdIOBasic, StdKey, StdMaybe
 from	id			import	:: Id, :: RId, :: R2Id, instance toString Id, instance == Id, 
-						instance == RId, instance == R2Id
+						instance == (RId mess), instance == (R2Id mess resp)
 
 
 /*	The SelectState and MarkState types.				*/
