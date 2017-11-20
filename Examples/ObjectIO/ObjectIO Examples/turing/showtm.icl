@@ -1,7 +1,7 @@
 implementation module showtm
 
 import	StdArray, StdBool, StdClass, StdInt
-from	StdString		import instance % {#}
+from	StdString import instance % {#Char}
 import	StdPicture
 import	tm
 
