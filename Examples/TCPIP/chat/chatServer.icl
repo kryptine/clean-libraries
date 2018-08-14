@@ -8,6 +8,7 @@ module chatServer
 //  ********************************************************************************
 
 import  StdEnv, StdTCPChannels, StdMaybe
+from StdFunc import seq
 
 chatPort	:==	2000
 
