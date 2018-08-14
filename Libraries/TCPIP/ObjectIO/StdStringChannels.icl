@@ -1,6 +1,7 @@
 implementation module StdStringChannels
 
 import	StdEnv
+from StdFunc import seq
 import	StdPSt, StdId, StdPStClass, StdReceiver
 import	TCPChannelClass, TCPDef, TCPChannels, TCPEvent
 import	receiverdefaccess
