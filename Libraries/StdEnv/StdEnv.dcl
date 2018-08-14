@@ -23,4 +23,6 @@ import
 	StdFunc,
 	StdMisc,
 
-	StdEnum
+	StdEnum,
+	StdStrictLists
+
