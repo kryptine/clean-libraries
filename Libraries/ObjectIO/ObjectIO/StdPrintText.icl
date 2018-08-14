@@ -1,7 +1,7 @@
 implementation module StdPrintText
  
 import StdEnv, StdMaybe, StdPrint, StdPicture
- 
+from StdFunc import seq
 
 emulateScr	:== False
 NL13 		:== '\xD'	// carriage return
