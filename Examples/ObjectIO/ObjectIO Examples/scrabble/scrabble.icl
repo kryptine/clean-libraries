@@ -1,6 +1,5 @@
 module	scrabble
 
-
 //	**************************************************************************************************
 //
 //	This program implements the Scrabble game (without blank letters).
@@ -10,11 +9,10 @@ module	scrabble
 //	
 //	**************************************************************************************************
 
-
 import	StdEnv, StdIO
 import	board, graphics, state, language, systemsettings
 import	Help, ListBox
-
+from StdFunc import seq
 
 /***************************************************************************************************************
 	The Start rule creates the GUI of the scrabble game and the initial program state.
