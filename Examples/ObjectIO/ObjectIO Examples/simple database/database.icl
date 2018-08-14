@@ -1,6 +1,5 @@
 module database
 
-
 //	**************************************************************************************************
 //
 //	A database application that can read, generate, browse and edit *.dbs files.
@@ -9,8 +8,8 @@ module database
 //	
 //	**************************************************************************************************
 
-
 import StdEnv, StdIO, Notice
+from StdFunc import seq,seqList
 
 ::	Record
 	:==	Entry								// [Content]

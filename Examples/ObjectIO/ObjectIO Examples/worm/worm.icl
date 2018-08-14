@@ -8,10 +8,9 @@ module worm
 //	
 //	**************************************************************************************************
 
-
 import StdEnv, StdIO
 import wormshow, wormstate, Help, Notice
-
+from StdFunc import seq
 
 //	GUI constants.
 HelpFile		:== "WormHelp"

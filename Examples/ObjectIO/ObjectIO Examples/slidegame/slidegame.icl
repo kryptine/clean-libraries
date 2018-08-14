@@ -1,6 +1,5 @@
 module slidegame
 
-
 //	**************************************************************************************************
 //
 //	A simple slide game that uses bitmaps to show nice pictures.
@@ -15,9 +14,8 @@ module slidegame
 //	
 //	**************************************************************************************************
 
-
 import StdEnv, StdIO, Random
-
+from StdFunc import seqList
 
 /*	openSlideGame first attempts to read in the bitmap.
 	If successfull, openSlideGame then checks whether the given bitmap has proper dimensions.

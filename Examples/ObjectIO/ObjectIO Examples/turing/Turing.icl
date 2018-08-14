@@ -10,7 +10,7 @@ module Turing
 
 import StdEnv, StdIO
 import tm, showtm, tmdialog, tmfile, Help
-
+from StdFunc import seq
 
 Speed1	:== ticksPerSecond / 3
 Speed2	:== ticksPerSecond / 6

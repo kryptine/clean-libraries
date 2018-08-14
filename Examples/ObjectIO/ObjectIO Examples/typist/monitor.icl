@@ -1,6 +1,5 @@
 implementation module monitor
 
-
 //	**************************************************************************************************
 //
 //	This module defines a process creation function that tracks the number of typed keys in a typing
@@ -9,9 +8,8 @@ implementation module monitor
 //	
 //	**************************************************************************************************
 
-
 import StdEnv, StdIO
-
+from StdFunc import seq
 
 ::	Count
 	=	{	oks			:: Int		// nr of OK keys
