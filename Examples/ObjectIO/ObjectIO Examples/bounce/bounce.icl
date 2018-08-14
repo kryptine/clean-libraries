@@ -1,6 +1,5 @@
 module bounce
 
-
 //	**************************************************************************************************
 //
 //	A program that creates two interactive processes that bounce balls in an open-ended barrel.
@@ -9,10 +8,9 @@ module bounce
 //	
 //	**************************************************************************************************
 
-
 import StdEnv, StdIO
 import bounceDraw
-
+from StdFunc import seq
 
 ::	Message									// The message type:
 	=	BallsArrive [Ball]					// balls that have crossed process border
