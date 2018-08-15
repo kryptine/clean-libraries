@@ -1455,9 +1455,9 @@ where
 	getwindowscrollfunction :: !Direction !(WindowStateHandle .pst) -> *(!Maybe ScrollFunction,!WindowStateHandle .pst)
 	getwindowscrollfunction direction wsH=:{wshHandle=Just {wlsHandle=wH=:{whWindowInfo}}}
 		| direction==Horizontal && isJust hScroll
-			= (fst (accMaybe getScrollFun hScroll),wsH)
+			= (mapMaybe getScrollFun hScroll,wsH)
 		| direction==Vertical && isJust vScroll
-			= (fst (accMaybe getScrollFun vScroll),wsH)
+			= (mapMaybe getScrollFun vScroll,wsH)
 		| otherwise
 			= (Nothing,wsH)
 	where
@@ -1465,9 +1465,9 @@ where
 		hScroll				= windowInfo.windowHScroll
 		vScroll				= windowInfo.windowVScroll
 		
-		getScrollFun :: !ScrollInfo -> *(!ScrollFunction,!ScrollInfo)
+		getScrollFun :: !ScrollInfo -> ScrollFunction
 		getScrollFun info=:{scrollFunction}
-			= (scrollFunction,info)
+			= scrollFunction
 	getwindowscrollfunction _ _
 		= stdWindowFatalError "getWindowScrollFunction" "unexpected window placeholder argument"
 
