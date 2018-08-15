@@ -4,7 +4,6 @@ definition module StdMaybe
 //	Clean StdLib library module, version 1.0
 //	********************************************************************************
 
-from StdFunc import :: St;
 from StdOverloaded import class ==(..);
 
 ::	Maybe x
@@ -18,10 +17,6 @@ fromJust	:: !(Maybe .x) -> .x		// \(Just x) -> x
 // for possibly unique elements:
 u_isJust :: !u:(Maybe .x) -> (!Bool, !u:Maybe .x)
 u_isNothing :: !u:(Maybe .x) -> (!Bool, !u:Maybe .x)
-
-accMaybe :: .(St .x .a) !u:(Maybe .x) -> (!Maybe .a,!u:Maybe .x)
-// accMaybe f (Just x) = (Just (fst (f x)),Just (snd (f x)))
-// accMaybe f Nothing  = (Nothing,Nothing)
 
 mapMaybe	:: .(.x -> .y) !(Maybe .x) -> Maybe .y
 // mapMaybe f (Just x) = Just (f x)

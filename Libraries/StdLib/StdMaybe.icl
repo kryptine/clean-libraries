@@ -4,7 +4,6 @@ implementation module StdMaybe
 //	Clean StdLib library module, version 1.0
 //	********************************************************************************
 
-from StdFunc import :: St;
 from StdOverloaded import class ==(..);
 
 ::	Maybe x
@@ -33,13 +32,6 @@ u_isNothing just
 
 fromJust :: !(Maybe .x) -> .x
 fromJust (Just x) = x
-
-accMaybe :: .(St .x .a) !u:(Maybe .x) -> (!Maybe .a,!u:Maybe .x)
-accMaybe f (Just x)
-	# (a,x) = f x
-	= (Just a,Just x)
-accMaybe _ nothing
-	= (Nothing,nothing)
 
 mapMaybe :: .(.x -> .y) !(Maybe .x) -> Maybe .y
 mapMaybe f (Just x) = Just (f x)
