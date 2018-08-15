@@ -175,25 +175,24 @@ where
 // MW11..
 letOneReceiverDoInetEvent (eventCode,endpointRef,inetReceiverCategory,misc) rsHs pState
 	# (opt_rsH,rsHs)	= selectReceiver (endpointRef,inetReceiverCategory) rsHs
-	  (nothing,opt_rsH)	= u_isNothing opt_rsH
-	| nothing
-/* PA: receiver device must be restored, because it is removed from the IOSt
-		= pState		// No ioSetReceiverDevice needed, because nothing has been changed
-*/		= appPIO (ioStSetDevice (ReceiverSystemState {rReceivers=rsHs})) pState
-	# eventInfo			= (eventCode,endpointRef,misc)
-	# rsH				= fromJust opt_rsH
-	# (rSelect,emptyASMQ,inetRId,rsH)
-						= (\rsH=:{rHandle=rH=:{rSelect,rASMQ}}->(rSelect,isEmpty rASMQ,getInetReceiverRId rH,rsH)) rsH
-	| enabled rSelect && emptyASMQ
-		 = applyInetEvent eventInfo rsH rsHs pState	// apply the event immediately
-	// receiver is unable, so queue the event via asyncSend to handle it later
-	# receivers			= ReceiverSystemState {rReceivers=[rsH:rsHs]} // left at the beginning
-	  pState			= appPIO (ioStSetDevice receivers) pState
-	# (sR,pState)		= asyncSend inetRId eventInfo pState
-	| sR<>SendOk
-		= abort "receiverdevice: I have a bug (78)"	
-	| otherwise
-		= pState
+	= case opt_rsH of
+		Nothing
+			// PA: receiver device must be restored, because it is removed from the IOSt
+			-> appPIO (ioStSetDevice (ReceiverSystemState {rReceivers=rsHs})) pState
+		Just rsH
+			# eventInfo		= (eventCode,endpointRef,misc)
+			# (rSelect,emptyASMQ,inetRId,rsH)
+							= (\rsH=:{rHandle=rH=:{rSelect,rASMQ}}->(rSelect,isEmpty rASMQ,getInetReceiverRId rH,rsH)) rsH
+			| enabled rSelect && emptyASMQ
+				 -> applyInetEvent eventInfo rsH rsHs pState	// apply the event immediately
+			// receiver is unable, so queue the event via asyncSend to handle it later
+			# receivers		= ReceiverSystemState {rReceivers=[rsH:rsHs]} // left at the beginning
+			  pState		= appPIO (ioStSetDevice receivers) pState
+			# (sR,pState)	= asyncSend inetRId eventInfo pState
+			| sR<>SendOk
+				-> abort "receiverdevice: I have a bug (78)"	
+			| otherwise
+				-> pState
 where
 	selectReceiver :: !(!EndpointRef`,!InetReceiverCategory`) !*[ReceiverStateHandle .pst]
 					   -> (!*Maybe (ReceiverStateHandle .pst),!*[ReceiverStateHandle .pst])
