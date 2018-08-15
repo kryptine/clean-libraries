@@ -82,10 +82,11 @@ instance Receivers TCP_ListenerReceiver where
 	where
 		handleConnectRequest f (IE_CONNECTREQUEST,endpointRef,_) (ls,ps=:{io})
 			# (_, mbHostDuplexChan,_,io) = receive_MT (Just 0) (pack_tcplistener endpointRef) io
-			  (isNothin`,mbHostDuplexChan) = u_isNothing mbHostDuplexChan
-			| isNothin`
-				= (ls,{ ps & io=io})
-			= f (Received (fromJust mbHostDuplexChan)) (ls,{ ps & io=io})
+			= case mbHostDuplexChan of
+				Nothing
+					-> (ls, {ps & io=io})
+				Just hostDuplexChan
+					-> f (Received hostDuplexChan) (ls, {ps & io=io})
 
 	getReceiverType _
 		= "TCP_ListenerReceiver"
