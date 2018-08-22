@@ -18,16 +18,16 @@ isNothing :: !(Maybe .x) -> Bool
 isNothing Nothing	= True
 isNothing _		= False
 
-u_isJust :: !u:(Maybe .x) -> (!Bool, !u:Maybe .x)
-u_isJust nothing=:Nothing
+isJustU :: !u:(Maybe .x) -> (!Bool, !u:Maybe .x)
+isJustU nothing=:Nothing
 	= (False, nothing)
-u_isJust just
+isJustU just
 	= (True, just)
 
-u_isNothing :: !u:(Maybe .x) -> (!Bool, !u:Maybe .x)
-u_isNothing nothing=:Nothing
+isNothingU :: !u:(Maybe .x) -> (!Bool, !u:Maybe .x)
+isNothingU nothing=:Nothing
 	= (True, nothing)
-u_isNothing just
+isNothingU just
 	= (False,just)
 
 fromJust :: !(Maybe .x) -> .x

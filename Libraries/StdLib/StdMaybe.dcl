@@ -15,14 +15,14 @@ isNothing	:: !(Maybe .x) -> Bool		// not o isJust
 fromJust	:: !(Maybe .x) -> .x		// \(Just x) -> x
 
 // for possibly unique elements:
-u_isJust :: !u:(Maybe .x) -> (!Bool, !u:Maybe .x)
-u_isNothing :: !u:(Maybe .x) -> (!Bool, !u:Maybe .x)
+isJustU :: !u:(Maybe .x) -> (!Bool, !u:Maybe .x)
+isNothingU :: !u:(Maybe .x) -> (!Bool, !u:Maybe .x)
 
 mapMaybe	:: .(.x -> .y) !(Maybe .x) -> Maybe .y
 // mapMaybe f (Just x) = Just (f x)
 // mapMaybe f Nothing  = Nothing
 
-instance ==       (Maybe x) | == x
+instance == (Maybe x) | == x
 //	Nothing==Nothing
 //	Just a ==Just b <= a==b
 
