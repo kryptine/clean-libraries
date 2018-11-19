@@ -57,7 +57,7 @@ where
 					-> (False, pos)
 gFromString{|OBJECT|} fx str pos
 	# (mx, st) = fx str pos
-	= (mapMaybe OBJECT mx, st)
+	= (case mx of Just x -> Just (OBJECT x); Nothing -> Nothing, st)
 	
 gFromString{|RECORD|} fx str pos
 	= abort "gFromString for records is not implemented" 
