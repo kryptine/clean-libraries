@@ -44,7 +44,6 @@ instance toString WrappedDescriptor
     |   WrappedIntArray !{#Int}
     |   WrappedBoolArray !{#Bool}
     |   WrappedRealArray !{#Real}
-    |   WrappedFileArray !{#File}
 
 	// other arrays
     |   WrappedArray !{!arg}

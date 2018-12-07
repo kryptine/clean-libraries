@@ -78,8 +78,6 @@ mapWrapNode _ (WrappedBoolArray ba)
 	=	WrappedBoolArray ba
 mapWrapNode _ (WrappedRealArray ra)
 	=	WrappedRealArray ra
-mapWrapNode _ (WrappedFileArray fa)
-	=	WrappedFileArray fa
 
 mapArgs :: (a -> b) {!a} -> {!b}
 mapArgs f a
@@ -618,9 +616,6 @@ shallowWrap node
 		push_b	0
 		eq_desc_b	REAL 0
 		jmp_true	wrap_real_array
-		push_b	0
-		eq_desc_b	FILE 0
-		jmp_true	wrap_file_array
 
 		pushI	0
 		push_a	0
@@ -730,19 +725,6 @@ shallowWrap node
 
 		| fill result node
 		fill_r	e_Wrap_kWrappedRealArray 1 0 1 0 0
-		pop_a	1
-	.d 1 0
-					| A: <result>
-					| B:
-		rtn
-
-	:wrap_file_array
-					| A: <_array> <result>
-					| B: <desc>
-		pop_b	1
-
-		| fill result node
-		fill_r	e_Wrap_kWrappedFileArray 1 0 1 0 0
 		pop_a	1
 	.d 1 0
 					| A: <result>
