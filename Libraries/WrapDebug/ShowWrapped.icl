@@ -133,8 +133,6 @@ showNode _ (WrappedBoolArray a)
 	=	showBasicArray a
 showNode _ (WrappedRealArray a)
 	=	showBasicArray a
-showNode _ (WrappedFileArray a)
-	=	showBasicArray a
 showNode options (WrappedArray a)
 	=	["{" : flatten (intersperse [", "] [showWrapped options el \\ el <-: a])] ++ ["}"]
 showNode options (WrappedRecord descriptor args)
@@ -205,8 +203,6 @@ instance prune (WrappedNode a) | prune a where
 	prune depth maxDepth maxBreadth (WrappedBoolArray a)
 		=	pruneBasicArray depth maxDepth maxBreadth a
 	prune depth maxDepth maxBreadth (WrappedRealArray a)
-		=	pruneBasicArray depth maxDepth maxBreadth a
-	prune depth maxDepth maxBreadth (WrappedFileArray a)
 		=	pruneBasicArray depth maxDepth maxBreadth a
 	prune depth maxDepth maxBreadth (WrappedString a)
 		| size a > maxBreadth
