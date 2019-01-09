@@ -485,9 +485,7 @@ instance FileEnv World where
 	appFiles :: !.(*Files -> *Files) !*World -> *World
 	appFiles appfun world
 		#! files1=create_files
-// RWS ...		#! files=appfun files
 		   files=appfun files1
-// .. RWS
 		=  do_files files world
 		where
 			do_files :: !*Files !*World -> *World
@@ -498,3 +496,10 @@ instance FileEnv World where
 			 }
 
 create_files :== Files;
+
+fflush :: !*File -> (!Bool,!*File)
+fflush f = code {
+    .d 0 2 f
+    jsr flushF
+    .o 0 3 bf
+}
