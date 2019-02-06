@@ -46,19 +46,19 @@ where
 
 getConsPath :: !GenericConsDescriptor -> [ConsPos]
 getConsPath {gcd_index, gcd_type_def={gtd_num_conses}}
-	= doit gcd_index gtd_num_conses
+	| gtd_num_conses==0
+		= [] // for newtype
+		= doit gcd_index gtd_num_conses
 where
 	doit i n
-		| n == 0 	
-			= abort "getConsPath: zero conses\n"
 		| i >= n	
 			= abort "getConsPath: cons index >= number of conses"
 		| n == 1
 			= []
-		| i < (n/2)
-			= [ ConsLeft : doit i (n/2) ]
+		| i < (n>>1)
+			= [ ConsLeft : doit i (n>>1) ]
 		| otherwise
-			= [ ConsRight : doit (i - (n/2)) (n - (n/2)) ]
+			= [ ConsRight : doit (i - (n>>1)) (n - (n>>1)) ]
 
 bimapId :: Bimap .a .a	// deprecated, no longer used
 bimapId = { map_to = id, map_from = id }
