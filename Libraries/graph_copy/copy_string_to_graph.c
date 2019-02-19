@@ -21,6 +21,11 @@
 # endif
 #endif
 
+#if defined (MACH_O64) || defined (PIC)
+// Use positions relative to _ARRAY_ for address space layout randomization systems.
+#  define USE_DESC_RELATIVE_TO_ARRAY 1
+#endif
+
 extern void *INT_descriptor,*CHAR,*BOOL,*REAL,*__STRING__,*__ARRAY__;
 extern Int small_integers[],static_characters[];
 
@@ -62,7 +67,7 @@ Int *copy_string_to_graph (Int *string_p,void *begin_free_heap,void *end_free_he
 			if (!(desc & 1)){
 				*string_p=(Int)heap_p;
 				*arg_a=heap_p;
-#ifdef MACH_O64
+#ifdef USE_DESC_RELATIVE_TO_ARRAY
 				desc+=(Int)&__ARRAY__;
 #endif
 				*heap_p=desc;
@@ -167,7 +172,10 @@ Int *copy_string_to_graph (Int *string_p,void *begin_free_heap,void *end_free_he
 							array_size=string_p[1];
 							elem_desc=string_p[2];
 							string_p+=3;
-		
+#if defined (MACH_O64)
+							if (elem_desc!=0)
+								elem_desc+=(Int)&__ARRAY__;
+#endif
 							heap_p[1]=array_size;
 							heap_p[2]=elem_desc;
 							heap_p+=3;
@@ -650,7 +658,7 @@ Int *copy_string_to_graph (Int *string_p,void *begin_free_heap,void *end_free_he
 
 #ifdef THREAD
 				if (desc & 2){
-# ifdef MACH_O64
+# ifdef USE_DESC_RELATIVE_TO_ARRAY
 					node_p=(Int*)(desc-3)+(Int)&__ARRAY__;
 # else
 					node_p=(Int*)(desc-3);
@@ -690,7 +698,7 @@ void remove_forwarding_pointers_from_string (Int *string_p,Int *end_forwarding_p
 			Int desc;
 			
 			desc=*(Int*)forwarding_pointer;
-#ifdef MACH_O64
+#ifdef USE_DESC_RELATIVE_TO_ARRAY
 			*string_p=desc-(Int)&__ARRAY__;
 #else
 			*string_p=desc;
@@ -727,7 +735,7 @@ void remove_forwarding_pointers_from_string (Int *string_p,Int *end_forwarding_p
 						array_size=string_p[1];
 						elem_desc=string_p[2];
 						string_p+=3;
-													
+
 						if (elem_desc==0){
 						} else if (elem_desc==(Int)&INT_descriptor+2
 #if ARCH_64

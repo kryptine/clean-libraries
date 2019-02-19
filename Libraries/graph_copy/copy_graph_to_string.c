@@ -21,6 +21,11 @@
 # endif
 #endif
 
+#if defined (MACH_O64) || defined (PIC)
+// Use positions relative to _ARRAY_ for address space layout randomization systems.
+#  define USE_DESC_RELATIVE_TO_ARRAY 1
+#endif
+
 extern void *INT_descriptor,*CHAR,*BOOL,*REAL,*__STRING__,*__ARRAY__;
 
 /*inline*/
@@ -61,7 +66,7 @@ Int *copy_graph_to_string (Int *node_p,void *begin_free_heap,void *end_free_heap
 			if (((unsigned Int)node_p-(unsigned Int)begin_heap)>=heap_size){
 				if (heap_p>=(Int*)stack_begin)
 					return NULL;
-# ifdef MACH_O64
+# ifdef USE_DESC_RELATIVE_TO_ARRAY
 				heap_p[0]=3+(Int)node_p-(Int)&__ARRAY__;
 # else
 				heap_p[0]=3+(Int)node_p;
@@ -78,7 +83,7 @@ Int *copy_graph_to_string (Int *node_p,void *begin_free_heap,void *end_free_heap
 			
 			if (!(desc & 1)){
 				*node_p=1+(Int)heap_p;
-#ifdef MACH_O64
+#ifdef USE_DESC_RELATIVE_TO_ARRAY
 				*heap_p++=desc-(Int)&__ARRAY__;
 #else
 				*heap_p++=desc;
@@ -139,7 +144,11 @@ Int *copy_graph_to_string (Int *node_p,void *begin_free_heap,void *end_free_heap
 							node_p+=3;
 		
 							heap_p[0]=array_size;
+#if defined (MACH_O64)
+							heap_p[1]=elem_desc==0 ? elem_desc : elem_desc-(Int)&__ARRAY__;
+#else
 							heap_p[1]=elem_desc;
+#endif
 							heap_p+=2;
 													
 							if (elem_desc==0){
@@ -506,7 +515,7 @@ void remove_forwarding_pointers_from_graph (Int *node_p,Int **stack_end)
 			if ((forwarding_pointer & 1)==0)
 				break;
 
-#ifdef MACH_O64
+#ifdef USE_DESC_RELATIVE_TO_ARRAY
 			desc = (Int)&__ARRAY__ + *((Int*)(forwarding_pointer-1));
 #else
 			desc = *((Int*)(forwarding_pointer-1));
@@ -524,7 +533,7 @@ void remove_forwarding_pointers_from_graph (Int *node_p,Int **stack_end)
 						Int elem_desc;
 
 						elem_desc=node_p[2];
-													
+
 						if (elem_desc==0){
 							Int array_size;
 							
