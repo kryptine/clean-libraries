@@ -329,7 +329,8 @@ read_symbols file_name files
 	# (ok,base_of_code,exe_file) = freadi exe_file;
 	| not ok
 		= abort "Not a PECOFF image file (error in optional PE header)";
-	# (ok,base_of_data,exe_file) = freadi exe_file;
+	// base_of_data only for PE32+
+	# (ok,base_of_data,exe_file) = IF_INT_64_OR_32 (freadi exe_file) (True,0,exe_file);
 	| not ok
 		= abort "Not a PECOFF image file (error in optional PE header)";
 
@@ -337,7 +338,7 @@ read_symbols file_name files
 	# (ok,image_base,exe_file) = freadi exe_file;
 	| not ok
 		= abort "Not a PECOFF image file (error in optional PE header)";
-	# (ok,exe_file) = fseek exe_file (s_optional_header-32) FSeekCur;
+	# (ok,exe_file) = fseek exe_file (s_optional_header-IF_INT_64_OR_32 32 28) FSeekCur;
 	| not ok
 		= abort "Not a PECOFF image file (error in optional PE header)";
 
