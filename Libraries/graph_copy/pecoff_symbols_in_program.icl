@@ -211,32 +211,32 @@ read_symbol_table symbol_n n_symbols string_table symbol_table exe_file section_
 			| n_aux_symbols=='\0'
 				= read_symbol_table (symbol_n+1) n_symbols string_table symbol_table exe_file section_info;
 				# exe_file = skip_aux_entries n_aux_symbols exe_file;
-				= read_symbol_table (symbol_n+toInt n_aux_symbols) n_symbols string_table symbol_table exe_file section_info;
+				= read_symbol_table (symbol_n+1+toInt n_aux_symbols) n_symbols string_table symbol_table exe_file section_info;
 		| section_n==section_info.text_section_n
 			#! value = value+section_info.text_va;
 			# symbol_table = [(symbol_name,value):symbol_table];
 			| n_aux_symbols=='\0'
 				= read_symbol_table (symbol_n+1) n_symbols string_table symbol_table exe_file section_info;
 				# exe_file = skip_aux_entries n_aux_symbols exe_file;
-				= read_symbol_table (symbol_n+toInt n_aux_symbols) n_symbols string_table symbol_table exe_file section_info;
+				= read_symbol_table (symbol_n+1+toInt n_aux_symbols) n_symbols string_table symbol_table exe_file section_info;
 		| section_n==section_info.data_section_n
 			#! value = value+section_info.data_va;
 			# symbol_table = [(symbol_name,value):symbol_table];
 			| n_aux_symbols=='\0'
 				= read_symbol_table (symbol_n+1) n_symbols string_table symbol_table exe_file section_info;
 				# exe_file = skip_aux_entries n_aux_symbols exe_file;
-				= read_symbol_table (symbol_n+toInt n_aux_symbols) n_symbols string_table symbol_table exe_file section_info;
+				= read_symbol_table (symbol_n+1+toInt n_aux_symbols) n_symbols string_table symbol_table exe_file section_info;
 		| section_n==section_info.bss_section_n
 			#! value = value+section_info.bss_va;
 			# symbol_table = [(symbol_name,value):symbol_table];
 			| n_aux_symbols=='\0'
 				= read_symbol_table (symbol_n+1) n_symbols string_table symbol_table exe_file section_info;
 				# exe_file = skip_aux_entries n_aux_symbols exe_file;
-				= read_symbol_table (symbol_n+toInt n_aux_symbols) n_symbols string_table symbol_table exe_file section_info;
+				= read_symbol_table (symbol_n+1+toInt n_aux_symbols) n_symbols string_table symbol_table exe_file section_info;
 			| n_aux_symbols=='\0'
 				= read_symbol_table (symbol_n+1) n_symbols string_table symbol_table exe_file section_info;
 				# exe_file = skip_aux_entries n_aux_symbols exe_file;
-				= read_symbol_table (symbol_n+toInt n_aux_symbols) n_symbols string_table symbol_table exe_file section_info;
+				= read_symbol_table (symbol_n+1+toInt n_aux_symbols) n_symbols string_table symbol_table exe_file section_info;
 		= (symbol_table,exe_file);
 
 skip_aux_entries n_aux_symbols exe_file
