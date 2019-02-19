@@ -88,21 +88,21 @@ read_section_headers section_n n_section_headers section_headers exe_file
 	| section_n<n_section_headers
 		# (ok,i0,exe_file) = freadi exe_file;
 		# (ok,section_type,exe_file) = freadi exe_file;
-		# (ok,i2,exe_file) = freadi exe_file;
-		# (ok,i3,exe_file) = freadi exe_file;
-		# (ok,i4,exe_file) = freadi exe_file;
-		# (ok,i5,exe_file) = freadi exe_file;
-		# (ok,i6,exe_file) = freadi exe_file;
-		# (ok,i7,exe_file) = freadi exe_file;
-		# (ok,i8,exe_file) = freadi exe_file;
-		# (ok,i9,exe_file) = freadi exe_file;
+		# (ok,sh_flags,exe_file) = freadi exe_file;
+		# (ok,sh_addr,exe_file) = freadi exe_file;
+		# (ok,sh_offset,exe_file) = freadi exe_file;
+		# (ok,sh_size,exe_file) = freadi exe_file;
+		# (ok,sh_link,exe_file) = freadi exe_file;
+		# (ok,sh_info,exe_file) = freadi exe_file;
+		# (ok,sh_addralign,exe_file) = freadi exe_file;
+		# (ok,sh_entsize,exe_file) = freadi exe_file;
 		| section_type==2
-			# section_headers & symbol_table_offset = i4, symbol_table_size = i5,
-								string_table_section_n = i6, first_non_local_symbol = i7;
+			# section_headers & symbol_table_offset = sh_offset, symbol_table_size = sh_size,
+								string_table_section_n = sh_link, first_non_local_symbol = sh_info;
 			= read_section_headers (section_n+1) n_section_headers section_headers exe_file;
 		| section_type==3
 			| section_n==section_headers.string_table_section_n
-				# section_headers & string_table_offset = i4, string_table_size = i5;
+				# section_headers & string_table_offset = sh_offset, string_table_size = sh_size;
 				= read_section_headers (section_n+1) n_section_headers section_headers exe_file;
 				= read_section_headers (section_n+1) n_section_headers section_headers exe_file;
 			= read_section_headers (section_n+1) n_section_headers section_headers exe_file;
