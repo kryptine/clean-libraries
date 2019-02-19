@@ -114,7 +114,9 @@ exported_clean_symbol_length_le_8 s
 		| size s==7 && s.[2]=='T' && s.[3]=='u' && s.[4]=='p' && s.[5]=='l' && s.[6]=='e'
 			= True;
 			= False;
-	| size s==3 && s.[0]=='I' && s.[1]=='N' && s.[2]=='T'
+	| IF_INT_64_OR_32
+		(size s==4 && s.[0]=='d' && s.[1]=='I' && s.[2]=='N' && s.[3]=='T')
+		(size s==3 && s.[0]=='I' && s.[1]=='N' && s.[2]=='T')
 		= True;
 	| size s==4 && s.[0]=='C' && s.[1]=='H' && s.[2]=='A' && s.[3]=='R'
 		= True;
