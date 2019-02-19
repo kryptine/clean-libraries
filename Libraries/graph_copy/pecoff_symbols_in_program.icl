@@ -279,8 +279,10 @@ read_symbols file_name files
 	# (ok,machine,exe_file) = freadu2 exe_file;
 	| not ok
 		= abort "Not a PECOFF image file (error in PE header)";
-	| machine<>0x14c // IMAGE_FILE_MACHINE_I386
-		= abort "Not a PECOFF image file for an IA32 processor";
+	| machine<>IF_INT_64_OR_32 0x8664 0x14c // IMAGE_FILE_MACHINE_AMD64 or IMAGE_FILE_MACHINE_I386
+		= abort (IF_INT_64_OR_32
+			"Not a PECOFF image file for an AMD64 processor"
+			"Not a PECOFF image file for an IA32 processor");
 	# (ok,n_sections,exe_file) = freadu2 exe_file;
 	| not ok
 		= abort "Not a PECOFF image file (error in PE header)";
@@ -304,7 +306,7 @@ read_symbols file_name files
 
 	// read the stamdard fields of the optional PE header (not optional for an image)
 	# (ok,magic,exe_file) = freadu2 exe_file;
-	| not ok || magic<>0x10b // PE32 executable
+	| not ok || magic<>IF_INT_64_OR_32 0x20b 0x10b // PE32+ or PE32 executable
 		= abort "Not a PECOFF image file (error in optional PE header)";
 	# (ok,major_linker_version,exe_file) = freadc exe_file;
 	| not ok
