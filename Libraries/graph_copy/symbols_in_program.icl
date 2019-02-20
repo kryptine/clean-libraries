@@ -83,19 +83,29 @@ string_from_string_table i s
 	# e = skip_to_null_char i s;
 	= s % (i,e-1);
 
+freadi64 :: !*File -> (!Bool,!Int,!*File);
+freadi64 exe_file
+	# (ok, i1, exe_file) = freadi exe_file;
+	| not ok
+		= (False, 0, exe_file);
+	# (ok, i2, exe_file) = freadi exe_file;
+	| not ok
+		= (False, 0, exe_file);
+	= (True, (i2 << 32) + i1, exe_file);
+
 read_section_headers :: !Int !Int !SectionHeaders !*File -> (!SectionHeaders,!*File);
 read_section_headers section_n n_section_headers section_headers exe_file
 	| section_n<n_section_headers
 		# (ok,i0,exe_file) = freadi exe_file;
 		# (ok,section_type,exe_file) = freadi exe_file;
-		# (ok,sh_flags,exe_file) = freadi exe_file;
-		# (ok,sh_addr,exe_file) = freadi exe_file;
-		# (ok,sh_offset,exe_file) = freadi exe_file;
-		# (ok,sh_size,exe_file) = freadi exe_file;
+		# (ok,sh_flags,exe_file) = IF_INT_64_OR_32 (freadi64 exe_file) (freadi exe_file);
+		# (ok,sh_addr,exe_file) = IF_INT_64_OR_32 (freadi64 exe_file) (freadi exe_file);
+		# (ok,sh_offset,exe_file) = IF_INT_64_OR_32 (freadi64 exe_file) (freadi exe_file);
+		# (ok,sh_size,exe_file) = IF_INT_64_OR_32 (freadi64 exe_file) (freadi exe_file);
 		# (ok,sh_link,exe_file) = freadi exe_file;
 		# (ok,sh_info,exe_file) = freadi exe_file;
-		# (ok,sh_addralign,exe_file) = freadi exe_file;
-		# (ok,sh_entsize,exe_file) = freadi exe_file;
+		# (ok,sh_addralign,exe_file) = IF_INT_64_OR_32 (freadi64 exe_file) (freadi exe_file);
+		# (ok,sh_entsize,exe_file) = IF_INT_64_OR_32 (freadi64 exe_file) (freadi exe_file);
 		| section_type==2
 			# section_headers & symbol_table_offset = sh_offset, symbol_table_size = sh_size,
 								string_table_section_n = sh_link, first_non_local_symbol = sh_info;
@@ -109,21 +119,44 @@ read_section_headers section_n n_section_headers section_headers exe_file
 	= (section_headers,exe_file);
 
 read_symbol_table symbol_n symbol_table_size string_table symbols exe_file
+	= IF_INT_64_OR_32 
+		(read_symbol_table64 symbol_n symbol_table_size string_table symbols exe_file) 
+		(read_symbol_table32 symbol_n symbol_table_size string_table symbols exe_file);
+
+read_symbol_table32 symbol_n symbol_table_size string_table symbols exe_file
 	| symbol_n<<4 < symbol_table_size
 		# (ok,i0,exe_file) = freadi exe_file;
 		# (ok,i1,exe_file) = freadi exe_file;
 		# (ok,i2,exe_file) = freadi exe_file;
 		#! (ok,i3,exe_file) = freadi exe_file;
 		| not (exported_clean_symbol i0 string_table)
-			= read_symbol_table (symbol_n+1) symbol_table_size string_table symbols exe_file;
+			= read_symbol_table32 (symbol_n+1) symbol_table_size string_table symbols exe_file;
 		# object = i3 bitand 0xf;
 		  bind = (i3>>4) bitand 0xf;
 		| (object==1 /*OBJECT*/ || object==2 /*FUNC*/ || object==0 /*NOTYPE*/) &&
 		  bind==1 /* GLOBAL */
 			# symbol_name = string_from_string_table i0 string_table;
 			# symbols = [(symbol_name,i1):symbols];
-			= read_symbol_table (symbol_n+1) symbol_table_size string_table symbols exe_file;
-		= read_symbol_table (symbol_n+1) symbol_table_size string_table symbols exe_file;
+			= read_symbol_table32 (symbol_n+1) symbol_table_size string_table symbols exe_file;
+		= read_symbol_table32 (symbol_n+1) symbol_table_size string_table symbols exe_file;
+	= (symbols,exe_file);
+
+read_symbol_table64 symbol_n symbol_table_size string_table symbols exe_file
+	| symbol_n*24 < symbol_table_size
+		# (ok,st_name,exe_file) = freadi exe_file;
+		# (ok,i1,exe_file) = freadi exe_file;
+		# (ok,st_value,exe_file) = freadi64 exe_file;
+		#! (ok,st_size,exe_file) = freadi64 exe_file;
+		| not (exported_clean_symbol st_name string_table)
+			= read_symbol_table64 (symbol_n+1) symbol_table_size string_table symbols exe_file;
+		# object = i1 bitand 0xf;
+		  bind = (i1>>4) bitand 0xf;
+		| (object==1 /*OBJECT*/ || object==2 /*FUNC*/ || object==0 /*NOTYPE*/) &&
+		  bind==1 /* GLOBAL */
+			# symbol_name = string_from_string_table st_name string_table;
+			# symbols = [(symbol_name,st_value):symbols];
+			= read_symbol_table64 (symbol_n+1) symbol_table_size string_table symbols exe_file;
+		= read_symbol_table64 (symbol_n+1) symbol_table_size string_table symbols exe_file;
 	= (symbols,exe_file);
 
 read_symbols :: !{#Char} !*Files -> (!{#Symbol},!*Files);
@@ -144,9 +177,9 @@ read_symbols file_name files
 	| not ok || c<>'F'
 		= abort "Not an ELF file (error in header)";
 
-	# (ok,exe_file) = fseek exe_file 32 FSeekSet;
-	# (ok,section_headers_offset,exe_file) = freadi exe_file;
-	# (ok,exe_file) = fseek exe_file 48 FSeekSet;
+	# (ok,exe_file) = fseek exe_file (IF_INT_64_OR_32 40 32) FSeekSet;
+	# (ok,section_headers_offset,exe_file) = IF_INT_64_OR_32 (freadi64 exe_file) (freadi exe_file);
+	# (ok,exe_file) = fseek exe_file (IF_INT_64_OR_32 60 48) FSeekSet;
 	| not ok
 		= abort "fseek failed";
 	# (ok,i ,exe_file) = freadi exe_file;
@@ -171,7 +204,7 @@ read_symbols file_name files
 	| size string_table<>section_headers.string_table_size
 		= abort "reading symbol table failed";
 	# section_n = section_headers.first_non_local_symbol;
-	# offset = section_headers.symbol_table_offset + (section_n<<4);
+	# offset = section_headers.symbol_table_offset + (IF_INT_64_OR_32 (section_n*24) (section_n<<4));
 	# (ok,exe_file) = fseek exe_file offset FSeekSet;
 	| not ok
 		= abort "fseek failed";
