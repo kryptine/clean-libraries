@@ -64,15 +64,9 @@ get_thunk_arity_64 a = code {
 	load_si32 -4
 }
 
-get_thunk_descriptor a :== IF_INT_64_OR_32 (get_thunk_descriptor_64 a) (get_thunk_descriptor_32 a);
-
-get_thunk_descriptor_64 :: !Int -> Int;
-get_thunk_descriptor_64 a = code {
-	load_i -12
-}
-get_thunk_descriptor_32 :: !Int -> Int;
-get_thunk_descriptor_32 a = code {
-	load_i -8
+get_thunk_descriptor :: !Int -> Int;
+get_thunk_descriptor a = code inline {
+	get_thunk_desc
 }
 
 is_Int_D :: !Int -> Bool;
