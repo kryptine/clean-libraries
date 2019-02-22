@@ -144,7 +144,7 @@ Int *copy_graph_to_string (Int *node_p,void *begin_free_heap,void *end_free_heap
 							node_p+=3;
 		
 							heap_p[0]=array_size;
-#if defined (MACH_O64)
+#if defined (USE_DESC_RELATIVE_TO_ARRAY)
 							heap_p[1]=elem_desc==0 ? elem_desc : elem_desc-(Int)&__ARRAY__;
 #else
 							heap_p[1]=elem_desc;
