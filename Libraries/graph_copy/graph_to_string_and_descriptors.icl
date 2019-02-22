@@ -118,34 +118,21 @@ get_D_name d = code {
 	.o 1 0
 }
 
-get_D_cons_module d :== IF_INT_64_OR_32 (get_D_cons_module_64 d) (get_D_cons_module_32 d);
-
-get_D_cons_module_32 :: !Int -> Int;
-get_D_cons_module_32 d = code {
+get_D_cons_module :: !Int -> Int;
+get_D_cons_module d = code {
 	push_b 0
 	load_si16 0
 	addI
-	load_i 6
-}
-
-get_D_cons_module_64 :: !Int -> Int;
-get_D_cons_module_64 d = code {
-	push_b 0
-	load_si16 0
+	pushI 6
 	addI
-	load_si32 6
+	load_module_name
 }
 
-get_D_record_module d :== IF_INT_64_OR_32 (get_D_record_module_64 d) (get_D_record_module_32 d);
-
-get_D_record_module_32 :: !Int -> Int;
-get_D_record_module_32 d = code {
-	load_i -10
-}
-
-get_D_record_module_64 :: !Int -> Int;
-get_D_record_module_64 d = code {
-	load_si32 -10
+get_D_record_module :: !Int -> Int;
+get_D_record_module d = code {
+	pushI -10
+	addI
+	load_module_name
 }
 
 get_module_name_size a :== IF_INT_64_OR_32 (get_module_name_size_64 a) (get_module_name_size_32 a);
