@@ -172,7 +172,8 @@ Int *copy_string_to_graph (Int *string_p,void *begin_free_heap,void *end_free_he
 							array_size=string_p[1];
 							elem_desc=string_p[2];
 							string_p+=3;
-#if defined (MACH_O64)
+
+#if defined (USE_DESC_RELATIVE_TO_ARRAY)
 							if (elem_desc!=0)
 								elem_desc+=(Int)&__ARRAY__;
 #endif
