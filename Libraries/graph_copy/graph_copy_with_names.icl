@@ -110,6 +110,11 @@ is_Array_D d = code inline {
 	eq_desc_b ARRAY 1
 }
 
+desc_arity_offset :: Int;
+desc_arity_offset = code inline {
+	get_desc_arity_offset
+}
+
 get_D_name :: !Int -> {#Char};
 get_D_name d = code {
 	.d 0 1 i
@@ -641,7 +646,7 @@ lookup_symbol_value {di_prefix_arity_and_mod,di_name} mod_a symbols
 		| symbol_value== -1
 			= abort ("lookup_desc_info not found "+++symbol_name); 
 			# arity = prefix_n - PREFIX_D;
-			= symbol_value+(arity<<3)+2;
+			= symbol_value+(arity*desc_arity_offset)+2;
 
 lookup_symbol_values desc_info_a mod_a symbols
 	= {#lookup_symbol_value desc_info mod_a symbols \\ desc_info <-: desc_info_a};

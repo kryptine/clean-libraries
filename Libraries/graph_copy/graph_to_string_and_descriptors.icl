@@ -20,6 +20,11 @@ copy_to_string g = code {
 	.o 1 0
 }
 
+desc_arity_offset :: Int;
+desc_arity_offset = code inline {
+	get_desc_arity_offset
+}
+
 get_D_from_string s i :== IF_INT_64_OR_32 (get_D_from_string_64 s i) (get_D_from_string_32 s i);
 
 get_D_from_string_32 :: !{#Char} !Int -> Int;
@@ -257,7 +262,7 @@ get_module d
 	| arity < 256
 		| is__Cons_D d
 			= 0;
-		| is__Tuple_D (d-arity*8)
+		| is__Tuple_D (d-arity*desc_arity_offset)
 			= 0;
 			= get_D_cons_module d;
 		= get_D_record_module d;
@@ -462,7 +467,7 @@ info_of_desc_and_mod {desc,desc_mod_n} desc_tree
 	| arity < 256
 		| is__Cons_D desc
 			= ":";
-		| is__Tuple_D (desc-arity*8)
+		| is__Tuple_D (desc-arity*desc_arity_offset)
 			= {'t',arity_to_char arity};
 		= {'C',arity_to_char arity,arity_to_char (get_D_arity desc),toChar (desc_mod_n),toChar (desc_mod_n>>8)}
 			+++get_D_name desc+++"\0";
