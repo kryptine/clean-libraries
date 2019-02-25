@@ -20,6 +20,11 @@ copy_to_string g = code {
 	.o 1 0
 }
 
+desc_arity_offset :: Int;
+desc_arity_offset = code inline {
+	get_desc_arity_offset
+}
+
 get_array_D :: !{#Int} -> Int;
 get_array_D a = code {
 	pushD_a 0
@@ -119,42 +124,21 @@ get_D_name d = code {
 	.o 1 0
 }
 
-get_D_cons_module d :== IF_INT_64_OR_32 (get_D_cons_module_64 d) (get_D_cons_module_32 d);
-
-get_D_cons_module_32 :: !Int -> Int;
-get_D_cons_module_32 d = code {
+get_D_cons_module :: !Int -> Int;
+get_D_cons_module d = code {
 	push_b 0
 	load_si16 0
-	addI
-	load_i 6
-}
-
-get_D_cons_module_64 :: !Int -> Int;
-get_D_cons_module_64 d = code {
-	push_b 0
-	load_si16 0
-	addI
-	push_b 0
-	load_si32 6
 	addI
 	pushI 6
 	addI
+	load_module_name
 }
 
-get_D_record_module d :== IF_INT_64_OR_32 (get_D_record_module_64 d) (get_D_record_module_32 d);
-
-get_D_record_module_32 :: !Int -> Int;
-get_D_record_module_32 d = code {
-	load_i -10
-}
-
-get_D_record_module_64 :: !Int -> Int;
-get_D_record_module_64 d = code {
-	push_b 0
-	load_si32 -10
-	addI
+get_D_record_module :: !Int -> Int;
+get_D_record_module d = code {
 	pushI -10
 	addI
+	load_module_name
 }
 
 get_module_name_size a :== IF_INT_64_OR_32 (get_module_name_size_64 a) (get_module_name_size_32 a);
@@ -272,7 +256,7 @@ get_module d
 	| arity < 256
 		| is__Cons_D d
 			= 0;
-		| is__Tuple_D (d-arity*16)
+		| is__Tuple_D (d-arity*desc_arity_offset)
 			= 0;
 			= get_D_cons_module d;
 		= get_D_record_module d;
@@ -478,7 +462,7 @@ info_of_desc_and_mod {desc,desc_mod_n} desc_tree
 	| arity < 256
 		| is__Cons_D desc
 			= ":";
-		| is__Tuple_D (desc-arity*16)
+		| is__Tuple_D (desc-arity*desc_arity_offset)
 			= {'t',arity_to_char arity};
 		= {'C',arity_to_char arity,arity_to_char (get_D_arity desc),toChar (desc_mod_n),toChar (desc_mod_n>>8)}
 			+++get_D_name desc+++"\0";
