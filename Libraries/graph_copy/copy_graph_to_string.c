@@ -26,6 +26,15 @@
 #  define USE_DESC_RELATIVE_TO_ARRAY 1
 #endif
 
+int is_using_desc_relative_to_array (void)
+{
+#ifdef USE_DESC_RELATIVE_TO_ARRAY
+	return 1;
+#else
+	return 0;
+#endif
+}
+
 extern void *INT_descriptor,*CHAR,*BOOL,*REAL,*__STRING__,*__ARRAY__;
 
 /*inline*/
