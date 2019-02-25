@@ -109,6 +109,19 @@ desc_arity_offset = code inline {
 	get_desc_arity_offset
 }
 
+get_array_D :: !{#Int} -> Int;
+get_array_D a = code {
+	pushD_a 0
+	pop_a 1
+}
+
+// The c function is_using_desc_relative_to_array is defined in copy_graph_to_string.c
+// the function returns 1 if positions are relative to _ARRAY_ and 0 when not.
+is_using_desc_relative_to_array :: Int;
+is_using_desc_relative_to_array = code {
+	ccall is_using_desc_relative_to_array ":I"
+}
+
 get_D_name :: !Int -> {#Char};
 get_D_name d = code {
 	.d 0 1 i
@@ -497,50 +510,52 @@ lookup_descs i s n_descs symbols
 			= lookup_descs (i+(IF_INT_64_OR_32 24 12)+l) s n_descs symbols;
 		= abort (toString l+++" "+++toString d);
 
-replace_descs_by_desc_numbers_and_build_desc_tree :: !Int !*{#Char} !Int !DescOrModTree
+replace_descs_by_desc_numbers_and_build_desc_tree :: !Int !*{#Char} !Int !Int !DescOrModTree
 	-> (!*{#Char},!Int,!DescOrModTree);
-replace_descs_by_desc_numbers_and_build_desc_tree i s n_descs desc_tree
+replace_descs_by_desc_numbers_and_build_desc_tree i s n_descs array_desc desc_tree
 	| i>=size s
 		| i==size s
 			= (s,n_descs,desc_tree);
 			= abort "error in replace_descs_by_desc_numbers_and_build_desc_tree";
 	#! desc=get_D_from_string s i;
+	#! desc=desc+array_desc;
 	| desc bitand 1<>0
-		= replace_descs_by_desc_numbers_and_build_desc_tree (i+IF_INT_64_OR_32 8 4) s n_descs desc_tree;
+		= replace_descs_by_desc_numbers_and_build_desc_tree (i+IF_INT_64_OR_32 8 4) s n_descs array_desc desc_tree;
 	# (s,n_descs,desc_tree) = store_desc_n_and_add_desc desc i s n_descs desc_tree;
 	| desc bitand 2==0
 		# d = get_thunk_n_non_pointers desc;
 		= replace_descs_by_desc_numbers_and_build_desc_tree
-			(i+(IF_INT_64_OR_32 8 4)+(d<<(IF_INT_64_OR_32 3 2))) s n_descs desc_tree;
+			(i+(IF_INT_64_OR_32 8 4)+(d<<(IF_INT_64_OR_32 3 2))) s n_descs array_desc desc_tree;
 	# (d,not_array) = get_descriptor_n_non_pointers_and_not_array desc;
 	| not_array
 		= replace_descs_by_desc_numbers_and_build_desc_tree
-			(i+(IF_INT_64_OR_32 8 4)+(d<<(IF_INT_64_OR_32 3 2))) s n_descs desc_tree;
+			(i+(IF_INT_64_OR_32 8 4)+(d<<(IF_INT_64_OR_32 3 2))) s n_descs array_desc desc_tree;
 	| d==0 // _STRING_
 		#! l = get_D_from_string s (i+IF_INT_64_OR_32 8 4);
 		# l = IF_INT_64_OR_32 ((l+7) bitand -8) ((l+3) bitand -4);
-		= replace_descs_by_desc_numbers_and_build_desc_tree (i+(IF_INT_64_OR_32 16 8)+l) s n_descs desc_tree;
+		= replace_descs_by_desc_numbers_and_build_desc_tree (i+(IF_INT_64_OR_32 16 8)+l) s n_descs array_desc desc_tree;
 	| d==1 // _ARRAY_
 		#! d = get_D_from_string s (i+IF_INT_64_OR_32 16 8);
 		| d==0
-			= replace_descs_by_desc_numbers_and_build_desc_tree (i+(IF_INT_64_OR_32 24 12)) s n_descs desc_tree;
+			= replace_descs_by_desc_numbers_and_build_desc_tree (i+(IF_INT_64_OR_32 24 12)) s n_descs array_desc desc_tree;
+		# d=d+array_desc;
 		# (s,n_descs,desc_tree) = store_desc_n_and_add_desc d (i+IF_INT_64_OR_32 16 8) s n_descs desc_tree;
 		#! l = get_D_from_string s (i+IF_INT_64_OR_32 8 4);
         | is_Int_D d
 			# l = l << IF_INT_64_OR_32 3 2;
-			= replace_descs_by_desc_numbers_and_build_desc_tree (i+(IF_INT_64_OR_32 24 12)+l) s n_descs desc_tree;
+			= replace_descs_by_desc_numbers_and_build_desc_tree (i+(IF_INT_64_OR_32 24 12)+l) s n_descs array_desc desc_tree;
         | is_Real_D d
 			# l = l << 3;
-			= replace_descs_by_desc_numbers_and_build_desc_tree (i+(IF_INT_64_OR_32 24 12)+l) s n_descs desc_tree;
+			= replace_descs_by_desc_numbers_and_build_desc_tree (i+(IF_INT_64_OR_32 24 12)+l) s n_descs array_desc desc_tree;
         | is_Bool_D d
 			# l = IF_INT_64_OR_32 ((l+7) bitand -8) ((l+3) bitand -4);
-			= replace_descs_by_desc_numbers_and_build_desc_tree (i+(IF_INT_64_OR_32 24 12)+l) s n_descs desc_tree;
+			= replace_descs_by_desc_numbers_and_build_desc_tree (i+(IF_INT_64_OR_32 24 12)+l) s n_descs array_desc desc_tree;
 		# arity = get_D_node_arity d;
 		| arity>=256
 			# record_a_arity = get_D_record_a_arity d;
 			# record_b_arity = arity-256-record_a_arity;
 			# l = (l * record_b_arity) << IF_INT_64_OR_32 3 2;
-			= replace_descs_by_desc_numbers_and_build_desc_tree (i+(IF_INT_64_OR_32 24 12)+l) s n_descs desc_tree;
+			= replace_descs_by_desc_numbers_and_build_desc_tree (i+(IF_INT_64_OR_32 24 12)+l) s n_descs array_desc desc_tree;
 		= abort (toString l+++" "+++toString d);
 
 store_desc_n_and_add_desc :: Int Int !*{#Char} !Int !DescOrModTree -> (!*{#Char},!Int,!DescOrModTree);
@@ -599,8 +614,9 @@ make_mod_array n_mods mod_tree
 
 copy_to_string_with_names :: a -> (!*{#Char},!*{#DescInfo},!*{#String});
 copy_to_string_with_names g
+	# array_desc = if (is_using_desc_relative_to_array==1) (get_array_D {} - 2) 0;
 	# s = copy_to_string g;
-	# (s,n_descs,desc_tree) = replace_descs_by_desc_numbers_and_build_desc_tree 0 s 0 EmptyDescOrModTree;
+	# (s,n_descs,desc_tree) = replace_descs_by_desc_numbers_and_build_desc_tree 0 s 0 array_desc EmptyDescOrModTree;
 	# desc_a = make_desc_array n_descs desc_tree;
 	# (desc_a,n_mods,mod_tree) = make_module_tree desc_a;
 	# mod_a = make_mod_array n_mods mod_tree;
@@ -632,54 +648,63 @@ lookup_symbol_value {di_prefix_arity_and_mod,di_name} mod_a symbols
 lookup_symbol_values desc_info_a mod_a symbols
 	= {#lookup_symbol_value desc_info mod_a symbols \\ desc_info <-: desc_info_a};
 
-replace_desc_numbers_by_descs :: !Int !*{#Char} !{#Int} -> *{#Char};
-replace_desc_numbers_by_descs i s symbol_a
+replace_desc_numbers_by_descs :: !Int !*{#Char} !{#Int} !Int !Int -> *{#Char};
+replace_desc_numbers_by_descs i s symbol_a symbol_offset array_desc
 	| i>=size s
 		| i==size s
 			= s;
 			= abort ("error in replace_desc_numbers_by_descs "+++toString i);
 	#! desc=get_D_from_string s i;
 	| desc<0
-		= replace_desc_numbers_by_descs (i+IF_INT_64_OR_32 8 4) s symbol_a;
+		= replace_desc_numbers_by_descs (i+IF_INT_64_OR_32 8 4) s symbol_a symbol_offset array_desc;
 	# desc = symbol_a.[desc-1];
-	# s=store_int_in_string s i desc;
+	# desc=desc+symbol_offset;
+	# s=store_int_in_string s i (desc-array_desc);
 	| desc bitand 2==0
 		# d = get_thunk_n_non_pointers desc;
-		= replace_desc_numbers_by_descs (i+(IF_INT_64_OR_32 8 4)+(d<<(IF_INT_64_OR_32 3 2))) s symbol_a;
+		= replace_desc_numbers_by_descs (i+(IF_INT_64_OR_32 8 4)+(d<<(IF_INT_64_OR_32 3 2))) s symbol_a symbol_offset array_desc;
 	# (d,not_array) = get_descriptor_n_non_pointers_and_not_array desc;
 	| not_array
-		= replace_desc_numbers_by_descs (i+(IF_INT_64_OR_32 8 4)+(d<<(IF_INT_64_OR_32 3 2))) s symbol_a;
+		= replace_desc_numbers_by_descs (i+(IF_INT_64_OR_32 8 4)+(d<<(IF_INT_64_OR_32 3 2))) s symbol_a symbol_offset array_desc;
 	| d==0 // _STRING_
 		#! l = get_D_from_string s (i+IF_INT_64_OR_32 8 4);
 		# l = IF_INT_64_OR_32 ((l+7) bitand -8) ((l+3) bitand -4);
-		= replace_desc_numbers_by_descs (i+(IF_INT_64_OR_32 16 8)+l) s symbol_a;
+		= replace_desc_numbers_by_descs (i+(IF_INT_64_OR_32 16 8)+l) s symbol_a symbol_offset array_desc;
 	| d==1 // _ARRAY_
 		#! d = get_D_from_string s (i+IF_INT_64_OR_32 16 8);
 		| d==0
-			= replace_desc_numbers_by_descs (i+(IF_INT_64_OR_32 24 12)) s symbol_a;
+			= replace_desc_numbers_by_descs (i+(IF_INT_64_OR_32 24 12)) s symbol_a symbol_offset array_desc;
 		# d = symbol_a.[d-1];
-		# s=store_int_in_string s (i+IF_INT_64_OR_32 16 8) d;
+		# d = d+symbol_offset;
+		# s=store_int_in_string s (i+IF_INT_64_OR_32 16 8) (d-array_desc);
 		#! l = get_D_from_string s (i+IF_INT_64_OR_32 8 4);
         | is_Int_D d
 			# l = l << IF_INT_64_OR_32 3 2;
-			= replace_desc_numbers_by_descs (i+(IF_INT_64_OR_32 24 12)+l) s symbol_a;
+			= replace_desc_numbers_by_descs (i+(IF_INT_64_OR_32 24 12)+l) s symbol_a symbol_offset array_desc;
         | is_Real_D d
 			# l = l << 3;
-			= replace_desc_numbers_by_descs (i+(IF_INT_64_OR_32 24 12)+l) s symbol_a;
+			= replace_desc_numbers_by_descs (i+(IF_INT_64_OR_32 24 12)+l) s symbol_a symbol_offset array_desc;
         | is_Bool_D d
 			# l = IF_INT_64_OR_32 ((l+7) bitand -8) ((l+3) bitand -4);
-			= replace_desc_numbers_by_descs (i+(IF_INT_64_OR_32 24 12)+l) s symbol_a;
+			= replace_desc_numbers_by_descs (i+(IF_INT_64_OR_32 24 12)+l) s symbol_a symbol_offset array_desc;
 		# arity = get_D_node_arity d;
 		| arity>=256
 			# record_a_arity = get_D_record_a_arity d;
 			# record_b_arity = arity-256-record_a_arity;
 			# l = (l * record_b_arity) << IF_INT_64_OR_32 3 2;
-			= replace_desc_numbers_by_descs (i+(IF_INT_64_OR_32 24 12)+l) s symbol_a;
+			= replace_desc_numbers_by_descs (i+(IF_INT_64_OR_32 24 12)+l) s symbol_a symbol_offset array_desc;
 		= abort (toString l+++" "+++toString d);
 
 copy_from_string_with_names :: !*{#Char} !*{#DescInfo} !*{#String} !{#Symbol} -> (.a,!Int);
 copy_from_string_with_names s desc_s_a mod_s_a symbols
 	# symbol_a = lookup_symbol_values desc_s_a mod_s_a symbols;
-	# s = replace_desc_numbers_by_descs 0 s symbol_a;
-	= copy_from_string s;
+	| is_using_desc_relative_to_array==1
+		# array_desc = get_array_D {} - 2;
+		# symbol_offset = array_desc - get_symbol_value "__ARRAY__" symbols;
+		# s = replace_desc_numbers_by_descs 0 s symbol_a symbol_offset array_desc;
+		= copy_from_string s;
+		# array_desc = 0;
+		# symbol_offset = 0;
+		# s = replace_desc_numbers_by_descs 0 s symbol_a symbol_offset array_desc;
+		= copy_from_string s;
 
