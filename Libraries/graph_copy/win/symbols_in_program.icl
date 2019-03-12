@@ -1,4 +1,4 @@
-implementation module pecoff_symbols_in_program;
+implementation module symbols_in_program;
 
 import StdEnv;
 

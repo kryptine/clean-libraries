@@ -1,4 +1,4 @@
-implementation module macho_symbols_in_program;
+implementation module symbols_in_program;
 
 // for Mach-O for Intel 64-bits
 

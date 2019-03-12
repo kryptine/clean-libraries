@@ -1,4 +1,4 @@
-definition module pecoff_symbols_in_program;
+definition module symbols_in_program;
 
 from StdFile import ::Files;
 import _SystemStrictLists;
