@@ -287,6 +287,17 @@ void os_connectTCP_syncC (int onlyForMac, int doTimeout, unsigned int stopTime,
 			timeout.tv_usec	= (timeoutTicks % 1000)*1000;	/* Timeout in microsec's */
 			noOfWritableSockets = select ((int)client+1,NULL,&writeSet,&exptnSet,&timeout);
 
+			int so_error;
+			socklen_t len = sizeof so_error;
+			getsockopt(client, SOL_SOCKET, SO_ERROR, &so_error, &len);
+
+			if (so_error != 0) {
+				*errCodeP = 1;
+				*timeoutExpiredP = 0;
+				close(client);
+				return;
+			}
+
 			*errCodeP =		noOfWritableSockets<0
 						||	(noOfWritableSockets>0 && FD_ISSET(client,&exptnSet));
 			*timeoutExpiredP	= noOfWritableSockets==0;
