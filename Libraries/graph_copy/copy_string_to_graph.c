@@ -180,9 +180,15 @@ Int *copy_string_to_graph (Int *string_p,void *begin_free_heap,void *end_free_he
 							heap_p[1]=array_size;
 							heap_p[2]=elem_desc;
 							heap_p+=3;
-													
+							
 							if (elem_desc==0){
 								Int i;
+
+								n_free_words-=array_size;
+								if (n_free_words<0){
+									*last_heap_pa=heap_p+array_size+(stack_end-stack_begin);
+									return (Int*)((Int)string_p+1);
+								}
 								
 								stack_p-=array_size;
 								if (stack_p<stack_begin){
@@ -272,6 +278,12 @@ Int *copy_string_to_graph (Int *string_p,void *begin_free_heap,void *end_free_he
 									Int i;
 									
 									array_size*=field_size;
+
+									n_free_words-=array_size;
+									if (n_free_words<0){
+										*last_heap_pa=heap_p+array_size+(stack_end-stack_begin);
+										return (Int*)((Int)string_p+1);
+									}
 
 									stack_p-=array_size;
 									if (stack_p<stack_begin){
