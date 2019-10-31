@@ -3,27 +3,9 @@ implementation module graph_copy_with_names;
 import StdEnv;
 import _SystemStrictLists;
 
-import code from "copy_graph_to_string_interface.";
-import code from "copy_graph_to_string.";
-import code from "copy_string_to_graph_interface.";
-import code from "copy_string_to_graph.";
-
+import graph_copy;
 import symbols_in_program;
 
-copy_to_string :: !.a -> *{#Char};
-copy_to_string g = code {
-    .d 1 0
-        jsr _copy_graph_to_string
-    .o 1 0
-}
-
-copy_from_string :: !*{#Char} -> (.a,!Int);
-copy_from_string g = code {
-    .d 1 0
-        jsr _copy_string_to_graph
-    .o 1 0
-        pushI 0
-}
 get_D_from_string s i :== IF_INT_64_OR_32 (get_D_from_string_64 s i) (get_D_from_string_32 s i);
 
 get_D_from_string_32 :: !{#Char} !Int -> Int;
