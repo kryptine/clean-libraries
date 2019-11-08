@@ -3,16 +3,13 @@
 
 #ifdef _WIN64
 # define Int __int64
-# define INT_descriptor dINT
 # define ARCH_64 1
 #else
 # if defined (MACH_O64) || defined (LINUX64)
 #  define Int long long
-#  define INT_descriptor dINT
 #  define ARCH_64 1
 # else
 #  define Int int
-#  define INT_descriptor INT
 #  define ARCH_64 0
 # endif
 # if !(defined (LINUX32) || defined (LINUX64))
@@ -26,7 +23,7 @@
 #  define USE_DESC_RELATIVE_TO_ARRAY 1
 #endif
 
-extern void *INT_descriptor,*CHAR,*BOOL,*REAL,*__STRING__,*__ARRAY__;
+extern void *INT,*CHAR,*BOOL,*REAL,*__STRING__,*__ARRAY__;
 extern Int small_integers[],static_characters[];
 
 /*inline*/
@@ -76,7 +73,7 @@ Int *copy_string_to_graph (Int *string_p,void *begin_free_heap,void *end_free_he
 					
 					arity=((unsigned short *)desc)[-1];
 					if (arity==0){
-						if (desc==(Int)&INT_descriptor+2){
+						if (desc==(Int)&INT+2){
 							Int i;
 							
 							i=string_p[1];
@@ -209,7 +206,7 @@ Int *copy_string_to_graph (Int *string_p,void *begin_free_heap,void *end_free_he
 
 								heap_p+=array_size;
 								break;
-							} else if (elem_desc==(Int)&INT_descriptor+2
+							} else if (elem_desc==(Int)&INT+2
 #if ARCH_64
 								|| elem_desc==(Int)&REAL+2
 #endif
@@ -721,7 +718,7 @@ void remove_forwarding_pointers_from_string (Int *string_p,Int *end_forwarding_p
 				
 				arity=((unsigned short *)desc)[-1];
 				if (arity==0){
-					if (desc==(Int)&INT_descriptor+2 || desc==(Int)&CHAR+2 || desc==(Int)&BOOL+2
+					if (desc==(Int)&INT+2 || desc==(Int)&CHAR+2 || desc==(Int)&BOOL+2
 #if ARCH_64
 						|| desc==(Int)&REAL+2
 #endif
@@ -750,7 +747,7 @@ void remove_forwarding_pointers_from_string (Int *string_p,Int *end_forwarding_p
 						string_p+=3;
 
 						if (elem_desc==0){
-						} else if (elem_desc==(Int)&INT_descriptor+2
+						} else if (elem_desc==(Int)&INT+2
 #if ARCH_64
 							|| elem_desc==(Int)&REAL+2
 #endif

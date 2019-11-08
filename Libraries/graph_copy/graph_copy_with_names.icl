@@ -299,7 +299,7 @@ make_symbol_name :: !String !String !Int -> String;
 make_symbol_name "_system" descriptor_name prefix
 	= case descriptor_name of {
 		"INT"
-			-> IF_INT_64_OR_32 "dINT" descriptor_name;
+			-> descriptor_name;
 		"CHAR"
 			-> descriptor_name;
 		"REAL"

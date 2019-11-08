@@ -3,16 +3,13 @@
 
 #ifdef _WIN64
 # define Int __int64
-# define INT_descriptor dINT
 # define ARCH_64 1
 #else
 # if defined (MACH_O64) || defined (LINUX64)
 #  define Int long long
-#  define INT_descriptor dINT
 #  define ARCH_64 1
 # else
 #  define Int int
-#  define INT_descriptor INT
 #  define ARCH_64 0
 # endif
 # if !(defined (LINUX32) || defined (LINUX64))
@@ -35,7 +32,7 @@ int is_using_desc_relative_to_array (void)
 #endif
 }
 
-extern void *INT_descriptor,*CHAR,*BOOL,*REAL,*__STRING__,*__ARRAY__;
+extern void *INT,*CHAR,*BOOL,*REAL,*__STRING__,*__ARRAY__;
 
 /*inline*/
 static void copy (Int *dest_p,Int *source_p,Int n_words)
@@ -102,7 +99,7 @@ Int *copy_graph_to_string (Int *node_p,void *begin_free_heap,void *end_free_heap
 					
 					arity=((unsigned short *)desc)[-1];
 					if (arity==0){
-						if (desc==(Int)&INT_descriptor+2 || desc==(Int)&CHAR+2 || desc==(Int)&BOOL+2
+						if (desc==(Int)&INT+2 || desc==(Int)&CHAR+2 || desc==(Int)&BOOL+2
 #if ARCH_64
 							|| desc==(Int)&REAL+2
 #endif
@@ -173,7 +170,7 @@ Int *copy_graph_to_string (Int *node_p,void *begin_free_heap,void *end_free_heap
 								while (--array_size>=0)
 									stack_p[array_size]=(Int*)node_p[array_size];						
 								break;
-							} else if (elem_desc==(Int)&INT_descriptor+2
+							} else if (elem_desc==(Int)&INT+2
 #if ARCH_64
 								|| elem_desc==(Int)&REAL+2
 #endif
@@ -554,7 +551,7 @@ void remove_forwarding_pointers_from_graph (Int *node_p,Int **stack_end)
 							while (--array_size>=0)
 								stack_p[array_size]=(Int*)node_p[array_size];						
 							break;
-						} else if (elem_desc==(Int)&INT_descriptor+2 || elem_desc==(Int)&REAL+2 || elem_desc==(Int)&BOOL+2){
+						} else if (elem_desc==(Int)&INT+2 || elem_desc==(Int)&REAL+2 || elem_desc==(Int)&BOOL+2){
 							break;
 						} else {
 							Int n_field_pointers;

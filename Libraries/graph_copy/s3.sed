@@ -1,4 +1,4 @@
-s/_dINT/dINT/
+s/_INT/INT/
 s/_CHAR/CHAR/
 s/_BOOL/BOOL/
 s/_REAL/REAL/
