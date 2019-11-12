@@ -14,6 +14,8 @@ import StdGeneric, StdEnv
 	| VField Value
 	| VObject Value
 
+:: Bimap a b = { map_to :: .(a -> b), map_from :: .(b -> a) }
+
 generic gConvertValue a :: Bimap a Value
 gConvertValue {|Int|} = {map_to = map_to, map_from = map_from }
 where
