@@ -34,16 +34,9 @@ get_D_record_a_arity d = code inline {
 	load_si16 0
 }
 
-get_thunk_arity a :== IF_INT_64_OR_32 (get_thunk_arity_64 a) (get_thunk_arity_32 a);
-
-get_thunk_arity_32:: !Int -> Int;
-get_thunk_arity_32 a = code {
-	load_i -4
-}
-
-get_thunk_arity_64 :: !Int -> Int;
-get_thunk_arity_64 a = code {
-	load_si32 -4
+get_thunk_arity :: !Int -> Int;
+get_thunk_arity a = code inline {
+	get_thunk_arity
 }
 
 get_thunk_descriptor :: !Int -> Int;
