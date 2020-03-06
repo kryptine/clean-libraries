@@ -77,7 +77,7 @@ instance - Vector2 where
 instance zero Vector2 where
 	zero = {vx=0,vy=0}
 instance ~ Vector2 where
-	(~) {vx,vy} = {vx=0-vx,vy=0-vy}
+	~ {vx,vy} = {vx=0-vx,vy=0-vy}
 instance toString Vector2 where
 	toString {vx,vy}
 		= curlify (itemsList "," (map recordFieldtoString (zip2 ["vx","vy"] [vx,vy])))
@@ -92,7 +92,7 @@ instance - Point2 where
 instance zero Point2 where
 	zero = {x=0,y=0}
 instance ~ Point2 where
-	(~) {x,y} = {x=0-x,y=0-y}
+	~ {x,y} = {x=0-x,y=0-y}
 instance toVector Point2 where
 	toVector {x,y}
 		= {vx=x,vy=y}
