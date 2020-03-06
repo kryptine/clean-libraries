@@ -15,8 +15,8 @@ instance == SelectState where
 	(==) Able	select = enabled select
 	(==) Unable	select = not (enabled select)
 instance ~ SelectState where
-	(~) Able	= Unable
-	(~) Unable	= Able
+	~ Able	= Unable
+	~ Unable	= Able
 instance toString SelectState where
 	toString Able   = "Able"
 	toString Unable = "Unable"
@@ -35,8 +35,8 @@ instance == MarkState where
 	(==) Mark	mark = marked mark
 	(==) NoMark	mark = not (marked mark)
 instance ~ MarkState where
-	(~) Mark	= NoMark
-	(~) _		= Mark
+	~ Mark	= NoMark
+	~ _		= Mark
 instance toString MarkState where
 	toString Mark   = "Mark"
 	toString NoMark = "NoMark"
@@ -596,11 +596,9 @@ instance == ErrorReport where
 	(==) ErrorUnknownObject	error	= case error of
 										ErrorUnknownObject	-> True
 										_					-> False
-// MW11..
 	(==) ErrorNotifierOpen	error	= case error of
 										ErrorNotifierOpen	-> True
 										_					-> False
-// ..MW11
 	(==) (OtherError e1)	error	= case error of
 										OtherError e2		-> e1==e2
 										_					-> False
@@ -630,7 +628,5 @@ where
 itemsList _ _
 	= ""
 
-// MW11..
 ::	OkBool									// iff True, the operation was successful
 	:==	Bool
-// ..MW11
